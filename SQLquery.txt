@@ -1,0 +1,11 @@
+SELECT g.h_alpha_flux, g.h_beta_flux, g.oiii_5007_flux, g.nii_6548_flux, g.nii_6584_flux
+FROM #upload u
+      JOIN #x x ON x.up_id = u.up_id
+      JOIN SpecObjAll s ON s.specObjID = x.specObjID
+      JOIN GalSpecLine g ON s.specobjid = g.specobjid
+WHERE
+    h_alpha_flux > h_alpha_flux_err*5
+    AND h_beta_flux > h_beta_flux_err*5
+    AND oiii_5007_flux > oiii_5007_flux_err*5
+    AND nii_6548_flux > nii_6548_flux_err*5
+    AND nii_6584_flux > g.nii_6584_flux_err*5

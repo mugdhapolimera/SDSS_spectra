@@ -1,0 +1,24 @@
+from __future__ import print_function
+
+import pyfits
+from scipy import ndimage
+from scipy.io.idl import readsav
+from scipy.optimize import curve_fit
+import numpy as np
+from time import clock
+import glob
+
+
+from numpy import pi
+from numpy.ma import median
+from matplotlib import pyplot as plt
+import sys
+
+r = readsav('/srv/one/resolve/database_internal/merged_idl_catalog/stable/resolvecatalog.dat')
+sel= np.where(r.inobssample == 1)
+galname= r.name[sel]
+ra = r.ra[sel]
+dec = r.dec[sel]
+
+create = np.array([galname, ra, dec])
+np.savetxt('fullRESOLVEcoords.txt', np.transpose(create), fmt ="%s")

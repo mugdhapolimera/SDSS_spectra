@@ -1,0 +1,25 @@
+Written by Ashley Bittner on August 3 2017
+
+(1) coords/
+- directory containing coordinates of various subsamples from RESOLVE in batches of 1000 so that they can be read into SDSS D12 Cross ID tool
+
+(2) SDSS_ECO_create.py
+- plots emission line diagrams from ECO SDSS data (2a)
+
+(2a) ECO_SDSS_raw.fits and ECO_SDSS_dext.fits
+- contains full ECO SDSS flux meausurements (raw and de-extincted, respectively)
+
+(3) SDSS_RESOLVE_create.py
+- plots emission line diagrams from RESOVLVE  SDSS data (3a, 3b)
+
+(3a) RESOVE_SDSS_raw.fits and RESOLVE_SDSS_dext.fits
+- contains full RESOLVE SDSS flux meausurements (raw and de-extincted, respectively)
+
+(3b) RESOVE_SDSS_dwarf.fits and RESOLVE_SDSS_dext_dwarf.fits
+- contains RESOLVE SDSS flux meausurements (raw and de-extincted, respectively) of dwarf galaxies (Mstar < 9.5 solar masses)
+
+(4) SQLquery.txt and SQLquery_ECO.txt
+- query used to identify SDSS line flux measurements of interest from various catalogues
+
+(5) resolve_comp.py
+- creates various plots attempting to understand the differences between the SDSS line flux measurements and the RESOLVE line flux measurements (merged_bztre.fits) made by Eriks codes

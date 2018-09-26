@@ -1,0 +1,12 @@
+SELECT 
+   p.objID, p.ra, p.dec, 
+   dbo.fPhotoTypeN(p.type) as type
+   g.h_alpha_flux, g.h_alpha_flux_err 
+   FROM GalSpecLine AS g 
+   JOIN SpecObj AS s
+   ON s.specobjid = g.specobjid
+   WHERE
+   h_alpha_flux > h_alpha_flux_err*5 
+FROM #x x, #upload u, PhotoTag p
+WHERE u.up_id = x.up_id and x.objID=p.objID 
+ORDER BY x.up_id
