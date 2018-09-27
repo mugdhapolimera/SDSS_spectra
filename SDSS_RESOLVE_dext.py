@@ -25,32 +25,19 @@ import os.path
 import sys
 import pdb
 import pylab
-pylab.ion()
-
-#import and concatenate all the batches
-
-#t1 = fits.open('coords/resolve_SDSS_one_SNR3.fits')
-#t2 = fits.open('coords/resolve_SDSS_two_SNR3.fits')
-
-#nrows1 = t1[1].data.shape[0]
-#nrows2 = t2[1].data.shape[0]
-#nrows = nrows1 + nrows2 
-
-#hdu = fits.new_table(fits.ColDefs(t1[1].columns), nrows=nrows)
-#for name in t1[1].columns.names:
-#    hdu.data.field(name)[nrows1:]=t2[1].data.field(name)
-#hdu.writeto('RESOLVE_SDSS_raw_SNR3.fits', clobber= True)
+#pylab.ion()
 
 
 #open the file
 hdulist = fits.open('RESOLVE_all.fits')
-#dwarf
-#hdulist = fits.open('coords/resolve_SDSS_dwarf_SNR3.fits')
+
 #extract the data
 hdu_data = hdulist[1].data
 #extract the header
 hdu_headers = hdulist[1].header
 #separate the data columns
+print hdu_data
+print hdu_headers
 galname = hdu_data.field(0)
 oii_3726_flux = hdu_data.field(1)
 oii_3726_flux_err = hdu_data.field(2)
@@ -86,10 +73,46 @@ sii_6731_flux = hdu_data.field(31)
 sii_6731_flux_err = hdu_data.field(32)
 ariii_7135_flux = hdu_data.field(33)
 ariii_7135_flux_err = hdu_data.field(34)
-heii_4685_flux = hdu_data.field(39)
-heii_4685_flux_err = hdu_data.field(40)
+#oiii_flux = hdu_data.field(39)
+#oiii_flux_err = hdu_data.field(40)
+heii_3206_flux_port = hdu_data.field(39)
+heii_3203_flux_port_err = hdu_data.field(40)
 oii_3726_flux_port = hdu_data.field(41)
 oii_3726_flux_port_err = hdu_data.field(42)
+oii_3729_flux_port = hdu_data.field(43)
+oii_3729_flux_port_err = hdu_data.field(44)
+neiii_3869_flux_port = hdu_data.field(45)
+neiii_3869_flux_port_err = hdu_data.field(46)
+h_delta_flux_port = hdu_data.field(47)
+h_delta_flux_port_err = hdu_data.field(48)
+h_gamma_flux_port = hdu_data.field(49)
+h_gamma_flux_port_err = hdu_data.field(50)
+oiii_4363_flux_port = hdu_data.field(51)
+oiii_4363_flux_port_err = hdu_data.field(52)
+heii_4865_flux_port = hdu_data.field(53)
+heii_4865_flux_port_err = hdu_data.field(54)
+ariv_4711_flux_port = hdu_data.field(55)
+ariv_4711_flux_port_err = hdu_data.field(56)
+h_beta_flux_port = hdu_data.field(57)
+h_beta_flux_port_err = hdu_data.field(58)
+oiii_4959_flux_port = hdu_data.field(59)
+oiii_4959_flux_port_err = hdu_data.field(60)
+oiii_5007_flux_port = hdu_data.field(61)
+oiii_5007_flux_port_err = hdu_data.field(62)
+hei_5876_flux_port = hdu_data.field(63)
+hei_5876_flux_port_err = hdu_data.field(64)
+oi_6300_flux_port = hdu_data.field(65)
+oi_6300_flux_port_err = hdu_data.field(66)
+nii_6548_flux_port = hdu_data.field(67)
+nii_6548_flux_port_err = hdu_data.field(68)
+h_alpha_flux_port = hdu_data.field(69)
+h_alpha_flux_port_err = hdu_data.field(70)
+nii_6584_flux_port = hdu_data.field(71)
+nii_6584_flux_port_err = hdu_data.field(72)
+sii_6717_flux_port = hdu_data.field(73)
+sii_6717_flux_port_err = hdu_data.field(74)
+sii_6731_flux_port = hdu_data.field(75)
+sii_6731_flux_port_err = hdu_data.field(76)
 ########reddening correct###############
 #intrinsic balmer decrement
 balm_dec_exp = 2.86
@@ -131,8 +154,25 @@ nii_6584_flux_ext = np.zeros(len(EBV_excess))
 sii_6717_flux_ext = np.zeros(len(EBV_excess))
 sii_6731_flux_ext = np.zeros(len(EBV_excess))
 ariii_7135_flux_ext = np.zeros(len(EBV_excess))
-heii_4685_flux_ext = np.zeros(len(EBV_excess))
+heii_4685_flux_port_ext = np.zeros(len(EBV_excess))
 oii_3726_flux_port_ext = np.zeros(len(EBV_excess))
+oii_3729_flux_port_ext = np.zeros(len(EBV_excess))
+neiii_3869_flux_port_ext = np.zeros(len(EBV_excess))
+h_delta_flux_port_ext = np.zeros(len(EBV_excess))
+h_gamma_flux_port_ext = np.zeros(len(EBV_excess))
+oiii_4363_flux_port_ext = np.zeros(len(EBV_excess))
+heii_4865_flux_port = np.zeros(len(EBV_excess))
+ariv_4711_flux_port = np.zeros(len(EBV_excess))
+h_beta_flux_port_ext = np.zeros(len(EBV_excess))
+oiii_4959_flux_port_ext = np.zeros(len(EBV_excess))
+oiii_5007_flux_port_ext = np.zeros(len(EBV_excess))
+hei_5876_flux_port_ext = np.zeros(len(EBV_excess))
+oi_6300_flux_port_ext = np.zeros(len(EBV_excess))
+nii_6548_flux_port_ext = np.zeros(len(EBV_excess))
+h_alpha_flux_port_ext  = np.zeros(len(EBV_excess))
+nii_6584_flux_port_ext = np.zeros(len(EBV_excess))
+sii_6717_flux_port_ext = np.zeros(len(EBV_excess))
+sii_6731_flux_port_ext = np.zeros(len(EBV_excess))
 
 
 #find conversion array for each galaxy at each wavelength
@@ -251,224 +291,4 @@ tbhdu = fits.new_table(cols)
 #tbhdu.writeto('RESOLVE_SDSS_dext.fits', clobber=True)
 #tbhdu.writeto('RESOLVE_SDSS_dext_dwarf_SNR3.fits', clobber=True)
 #####################################################################
-
-
-
-################################################
-
-#plot check BPT
-#define demarcation function, log_NII_HA vs. log_OIII_HB
-def log_OIII_HB_NII(log_NII_HA):
-    return 1.3 + (0.61 / (log_NII_HA - 0.05))
-
-def comp_OIII_HB_NII(log_NII_HA):
-    return 1.19 + 0.61 / (log_NII_HA - 0.47)
-
-# create line ratios [NII]/Halpha and [OIII]/Hbeta
-#check with Chris on this value, and Keweley 01 
-#nii_sum = nii_6584_flux_ext
-nii_sum = (nii_6548_flux_ext + nii_6584_flux_ext)*(3./4) 
-
-x = np.log10(nii_sum/h_alpha_flux_ext)
-y = np.log10(oiii_5007_flux_ext/h_beta_flux_ext)
-
-
-#create starforming vs. AGN line
-Measured_Predicted_OIII_HB = log_OIII_HB_NII(x)
-Measured_Predicted_comp_OIII_HB = comp_OIII_HB_NII(x)
-
-#generate list of points in x direction to plot demarcation line over entire range of plot
-Predicted_NII_HA = np.linspace(-3.0, 0.35)
-#evaluate function at those points
-Predicted_log_OIII_HB_NII = log_OIII_HB_NII(Predicted_NII_HA)
-Predicted_comp_log_OIII_HB_NII = comp_OIII_HB_NII(Predicted_NII_HA)
-
-############################select out spheroids for these line ratio ranges
-
-###single out E/S0s, and plot where there is available data
-# create list of known names and turn into array
-spheroids = np.loadtxt('blue_es0.txt', dtype = np.str)
-spher_arr = np.array(spheroids)
-
-#create list of  names of galaxies chosen by the HEII diagram
-active_stars =np.loadtxt('HeII_gals.txt', dtype = np.str)
-active_arr = np.array(active_stars)
-
-#create list of names of galaxies chosen by BPT diagram
-bpt_gals = np.loadtxt('BPT_gals.txt', dtype = np.str)
-bpt_arr = np.array(bpt_gals)
-
-x_sel = np.zeros(len(spher_arr))
-y_sel = np.zeros(len(spher_arr))
-activex = np.zeros(len(active_arr))
-activey = np.zeros(len(active_arr))
-bptx = np.zeros(len(bpt_arr))
-bpty = np.zeros(len(bpt_arr))
-for i in np.arange(len(spher_arr)):
-    if spher_arr[i] in galname:
-        sel_gal = spheroids[i]
-        x_sel[i]= x[(np.where(galname == sel_gal))]
-        y_sel[i]= y[(np.where(galname == sel_gal))]
-for i in np.arange(len(active_arr)):
-    if active_arr[i] in galname:
-        active_sel = active_stars[i]
-        activex[i] = x[(np.where(galname == active_sel))]
-        activey[i] = y[(np.where(galname == active_sel))]
-for i in np.arange(len(bpt_arr)):
-    if bpt_arr[i] in galname:
-        bpt_sel = bpt_gals[i]
-        bptx[i] = x[(np.where(galname == bpt_sel))]
-        bpty[i] = y[(np.where(galname == bpt_sel))]
-
-
-### sample regions above and below line to plot the points above and below separately, ie in different colors 
-#galaxies above line (AGN)
-Above_Predicted_AGN = y > Measured_Predicted_OIII_HB
-Above_Predicted_comp = y > Measured_Predicted_comp_OIII_HB
-
-
-#select range to avoid ugly log function behavior at origin of plot 
-sel = Predicted_NII_HA < 0
-
-#remove spurious point at (0,0)
-no_zero = np.where(x_sel != 0.)
-no_zero_active = np.where(activex != 0.) 
-no_zero_bpt = np.where(bptx != 0.)
-
-#plot
-fig = plt.figure(1)
-plt.clf
-ax = fig.add_subplot(111)
-demarc, = ax.plot(Predicted_NII_HA[sel], Predicted_log_OIII_HB_NII[sel], color = "black",linestyle = '--')
-composite, = ax.plot(Predicted_NII_HA, Predicted_comp_log_OIII_HB_NII, color = "black", linewidth = 1.5)
-full, = ax.plot(x, y, 'k.', markersize =4)
-es0s, = ax.plot(x_sel[no_zero],y_sel[no_zero],'bo', markersize = 8)
-active, = ax.plot(activex[no_zero_active],activey[no_zero_active],"rs", markersize = 8)
-bpt, = ax.plot(bptx[no_zero_bpt],bpty[no_zero_bpt],"c+", markersize = 10, mew=2)
-ax.set_xlim(-3,2)
-ax.set_ylim(-3,4)
-ax.set_xlabel(r"$\rm \log [NII] \lambda6584 / H\alpha $", fontsize = 18)
-ax.set_ylabel(r"$\rm \log [OIII]\lambda5007 / H\beta $", fontsize = 18)
-#plt.legend([full, es0s,active], ['RESOLVE galaxies', 'ES0s', 'HeII AGN'], loc = 'lower left', numpoints =1)
-#plt.savefig("SDSS_RESOLVE_BPT.eps")
-
-#plot
-#fig, ax = plt.subplots(1,2)
-#demarc, = ax[0].plot(Predicted_NII_HA[sel], Predicted_log_OIII_HB_NII[sel], color = "black",linestyle = '--')
-#composite, = ax[0].plot(Predicted_NII_HA, Predicted_comp_log_OIII_HB_NII, color = "black", linewidth = 1.5)
-#full, = ax[0].plot(x, y, 'k.', markersize =4)
-#es0s, = ax[0].plot(x_sel[no_zero],y_sel[no_zero],'bo', markersize = 4)
-#active, = ax[0].plot(activex[no_zero_active],activey[no_zero_active],"ro", markersize = 8)
-#ax[0].set_xlim(-3,2)
-#ax[0].set_ylim(-3,4)
-#ax[0].set_xlabel(r"$\rm \log([NII]/H\alpha)$", fontsize = 22)
-#ax[0].set_ylabel(r"$\rm \log([OIII]/H\beta)$", fontsize = 22)
-#ax[0].set_title("SDSS RESOLVE BPT", fontsize = 20)
-#ax[0].set(aspect = 'equal')
-plt.savefig("SDSS_RESOLVE_BPT.eps")
-
-
-###################################################################
-#plot HeII 
-
-#define AGN demarcation lines
-def log_HEII_HB(log_NII_HA):
-    return  -1.22 + 1.0 / ((8.92*log_NII_HA) + 1.32)
-
-
-heii_sel = np.where(heii_4685_flux_ext > heii_4685_flux_err*3.)
-galname_heii = galname[heii_sel]
-
-#define axis
-x_heii = np.log10(nii_sum[heii_sel]/h_alpha_flux_ext[heii_sel])
-y_heii = np.log10(heii_4685_flux_ext[heii_sel]/h_beta_flux_ext[heii_sel])
-
-
-#create starforming vs. AGN line
-Measured_Predicted_HEII_HB = log_HEII_HB(x_heii)
-
-
-#generate list of points in x direction to plot demarcation line over entire range of plot
-#evaluate function at those points
-#generate list of points in x direction to plot demarcation line over entire range of plot
-Predicted_NII_HA = np.linspace(-3.0, 0.35)
-Predicted_log_HEII_HB = log_HEII_HB(Predicted_NII_HA)
-
-
-#####select out spheroids for these line ratio ranges
-
-###single out E/S0s, and plot where there is available data
-# create list of known names and turn into array
-spheroids = np.loadtxt('blue_es0.txt', dtype = np.str)
-spher_arr = np.array(spheroids)
-
-#create list of  names of galaxies chosen by the HEII diagram
-#resolve
-active_stars =np.loadtxt('HeII_gals.txt', dtype = np.str)
-active_arr = np.array(active_stars)
-x_sel_heii = np.zeros(len(spher_arr), dtype = object)
-y_sel_heii = np.zeros(len(spher_arr), dtype = object)
-activex_heii = np.zeros(len(active_arr), dtype = object)
-activey_heii = np.zeros(len(active_arr), dtype = object)
-bptx_heii = np.zeros(len(bpt_arr), dtype = object)
-bpty_heii = np.zeros(len(bpt_arr), dtype = object)
-for i in np.arange(len(spher_arr)):
-    if spher_arr[i] in galname_heii:
-        sel_gal = spheroids[i]
-        x_sel_heii[i]= x_heii[(np.where(galname_heii == sel_gal))]
-        y_sel_heii[i]= y_heii[(np.where(galname_heii == sel_gal))]
-for i in np.arange(len(active_arr)):
-    if active_arr[i] in galname_heii:
-        active_sel = active_stars[i]
-        activex_heii[i] = x_heii[(np.where(galname_heii == active_sel))]
-        activey_heii[i] = y_heii[(np.where(galname_heii == active_sel))]
-for i in np.arange(len(bpt_arr)):
-    if bpt_arr[i] in galname_heii:
-        bpt_sel = bpt_gals[i]
-        bptx_heii[i] = x_heii[(np.where(galname_heii == bpt_sel))]
-        bpty_heii[i] = y_heii[(np.where(galname_heii == bpt_sel))]
-
-#select range to avoid ugly log function behavior at origin of plot 
-sel = Predicted_NII_HA < -0.15
-
-### sample regions above and below line to plot the points above and below separately, ie in different colors 
-#galaxies above line (AGN)
-Above_Predicted_AGN_heii = y_heii > Measured_Predicted_HEII_HB
-
-
-
-
-#remove spurious point at (0,0)
-no_zero_heii = np.where(x_sel_heii != 0) 
-no_zero_active_heii = np.where(activex_heii != 0) 
-no_zero_bpt_heii = np.where(bptx_heii != 0.)
-
-#plot
-fig = plt.figure(2)
-plt.clf
-ax_heii = fig.add_subplot(111)
-demarc, = ax_heii.plot(Predicted_NII_HA[sel], Predicted_log_HEII_HB[sel], color = "black",linewidth = 1.5)
-full, = ax_heii.plot(x_heii, y_heii, 'k.', markersize =4)
-es0s, = ax_heii.plot(x_sel_heii[no_zero_heii],y_sel_heii[no_zero_heii],'bo', markersize = 8)
-active, = ax_heii.plot(activex_heii[no_zero_active_heii],activey_heii[no_zero_active_heii],"rs", markersize = 8)
-bpt, = ax_heii.plot(bptx_heii[no_zero_bpt_heii],bpty_heii[no_zero_bpt_heii],"c+", markersize = 10, mew=2)
-ax_heii.set_xlim(-3.0,1.0)
-ax_heii.set_ylim(-3.0,1.0)
-ax_heii.set_xlabel(r"$\rm \log [NII]\lambda6584 / H\alpha$", fontsize = 18)
-ax_heii.set_ylabel(r"$\rm \log [HeII]\lambda4686 / H\beta$", fontsize = 18)
-plt.legend([full, es0s,active, bpt], ['RESOLVE galaxies', 'ES0s', 'HeII AGN', 'BPT AGN'], loc = 'lower left', numpoints =1, frameon = False, prop={'size':12})
-plt.savefig("SDSS_RESOLVE_HeII.eps")
-
-#demarc, = ax[1].plot(Predicted_NII_HA[sel], Predicted_log_HEII_HB[sel], color = "black",linewidth = 1.5)
-#full, = ax[1].plot(x_heii, y_heii, 'k.', markersize =4)
-#es0s, = ax[1].plot(x_sel_heii[no_zero_heii],y_sel_heii[no_zero_heii],'bo', markersize = 8)
-#active, = ax[1].plot(activex_heii[no_zero_active_heii],activey_heii[no_zero_active_heii],"ro", markersize = 8)
-#ax[1].set_xlim(-3.0,1.0)
-#ax[1].set_ylim(-3.0,1.0)
-#ax[1].set_xlabel(r"$\rm \log([NII]/H\alpha)$", fontsize = 22)
-#ax[1].set_ylabel(r"$\rm \log([HeII]/H\beta)$", fontsize = 22)
-#ax[1].set_title("SDSS RESOLVE HeII", fontsize = 20)
-#ax[1].set(aspect = 'equal')
-#plt.tight_layout()
-#plt.savefig("SDSS_RESOLVE_HeII.eps")
 
