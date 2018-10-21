@@ -29,15 +29,13 @@ import pylab
 
 
 #open the file
-hdulist = fits.open('RESOLVE_all.fits')
+hdulist = fits.open('C:\Users\mugdhapolimera\github\izi\RESOLVE_full.fits')
 
 #extract the data
 hdu_data = hdulist[1].data
 #extract the header
 hdu_headers = hdulist[1].header
 #separate the data columns
-print hdu_data
-print hdu_headers
 galname = hdu_data.field(0)
 oii_3726_flux = hdu_data.field(1)
 oii_3726_flux_err = hdu_data.field(2)
@@ -75,7 +73,8 @@ ariii_7135_flux = hdu_data.field(33)
 ariii_7135_flux_err = hdu_data.field(34)
 #oiii_flux = hdu_data.field(39)
 #oiii_flux_err = hdu_data.field(40)
-heii_3206_flux_port = hdu_data.field(39)
+
+heii_3203_flux_port = hdu_data.field(39)
 heii_3203_flux_port_err = hdu_data.field(40)
 oii_3726_flux_port = hdu_data.field(41)
 oii_3726_flux_port_err = hdu_data.field(42)
@@ -89,8 +88,8 @@ h_gamma_flux_port = hdu_data.field(49)
 h_gamma_flux_port_err = hdu_data.field(50)
 oiii_4363_flux_port = hdu_data.field(51)
 oiii_4363_flux_port_err = hdu_data.field(52)
-heii_4865_flux_port = hdu_data.field(53)
-heii_4865_flux_port_err = hdu_data.field(54)
+heii_4685_flux_port = hdu_data.field(53)
+heii_4685_flux_port_err = hdu_data.field(54)
 ariv_4711_flux_port = hdu_data.field(55)
 ariv_4711_flux_port_err = hdu_data.field(56)
 h_beta_flux_port = hdu_data.field(57)
@@ -154,15 +153,16 @@ nii_6584_flux_ext = np.zeros(len(EBV_excess))
 sii_6717_flux_ext = np.zeros(len(EBV_excess))
 sii_6731_flux_ext = np.zeros(len(EBV_excess))
 ariii_7135_flux_ext = np.zeros(len(EBV_excess))
-heii_4685_flux_port_ext = np.zeros(len(EBV_excess))
+
+heii_3203_flux_port_ext = np.zeros(len(EBV_excess))
 oii_3726_flux_port_ext = np.zeros(len(EBV_excess))
 oii_3729_flux_port_ext = np.zeros(len(EBV_excess))
 neiii_3869_flux_port_ext = np.zeros(len(EBV_excess))
 h_delta_flux_port_ext = np.zeros(len(EBV_excess))
 h_gamma_flux_port_ext = np.zeros(len(EBV_excess))
 oiii_4363_flux_port_ext = np.zeros(len(EBV_excess))
-heii_4865_flux_port = np.zeros(len(EBV_excess))
-ariv_4711_flux_port = np.zeros(len(EBV_excess))
+heii_4685_flux_port_ext = np.zeros(len(EBV_excess))
+ariv_4711_flux_port_ext = np.zeros(len(EBV_excess))
 h_beta_flux_port_ext = np.zeros(len(EBV_excess))
 oiii_4959_flux_port_ext = np.zeros(len(EBV_excess))
 oiii_5007_flux_port_ext = np.zeros(len(EBV_excess))
@@ -198,8 +198,27 @@ for i in np.arange(len(galname)):
     mw_A_sii_6717_rest = mw_A_atmwlam[1239]
     mw_A_sii_6731_rest = mw_A_atmwlam[1244]
     mw_A_ariii_7135_rest = mw_A_atmwlam[1378]
-    mw_A_heii_4685_rest = mw_A_atmwlam[562]
-    mw_A_oii_3726_port_rest = mw_A_atmwlam[242]
+    
+    mw_A_heii_3203_flux_port_rest = mw_A_atmwlam[68]
+    mw_A_oii_3726_flux_port_rest = mw_A_atmwlam[242]
+    mw_A_oii_3729_flux_port_rest = mw_A_atmwlam[243]
+    mw_A_neiii_3869_flux_port_rest = mw_A_atmwlam[290]
+    mw_A_h_delta_flux_port_rest = mw_A_atmwlam[367]
+    mw_A_h_gamma_flux_port_rest = mw_A_atmwlam[447]
+    mw_A_oiii_4363_flux_port_rest = mw_A_atmwlam[454]
+    mw_A_heii_4685_flux_port_rest = mw_A_atmwlam[562]
+    mw_A_ariv_4711_flux_port_rest = mw_A_atmwlam[570]
+    mw_A_h_beta_flux_port_rest= mw_A_atmwlam[620]
+    mw_A_oiii_4959_flux_port_rest = mw_A_atmwlam[653]
+    mw_A_oiii_5007_flux_port_rest = mw_A_atmwlam[669]
+    mw_A_hei_5876_flux_port_rest = mw_A_atmwlam[959]
+    mw_A_oi_6300_flux_port_rest = mw_A_atmwlam[1100]
+    mw_A_nii_6548_flux_port_rest = mw_A_atmwlam[1183]
+    mw_A_h_alpha_flux_port_rest  = mw_A_atmwlam[1187]
+    mw_A_nii_6584_flux_port_rest = mw_A_atmwlam[1195]
+    mw_A_sii_6717_flux_port_rest = mw_A_atmwlam[1239]
+    mw_A_sii_6731_flux_port_rest = mw_A_atmwlam[1244]
+
     #find deextinction for obs lambda for each galaxy
     oii_3726_deext_rest = 10.0**(mw_A_oii_3726_rest/2.5)
     oii_3729_deext_rest = 10.0**(mw_A_oii_3729_rest/2.5)
@@ -218,8 +237,28 @@ for i in np.arange(len(galname)):
     sii_6717_deext_rest = 10.0**(mw_A_sii_6717_rest/2.5)
     sii_6731_deext_rest = 10.0**(mw_A_sii_6731_rest/2.5)
     ariii_7135_deext_rest = 10.0**(mw_A_ariii_7135_rest/2.5)
-    heii_4685_deext_rest= 10.0**(mw_A_heii_4685_rest/2.5)
-    oii_3726_port_deext_rest = 10.0**(mw_A_oii_3726_port_rest/2.5)
+    
+
+    heii_3203_flux_port_deext_rest = 10.0**(mw_A_heii_3203_flux_port_rest/2.5) 
+    oii_3726_flux_port_deext_rest = 10.0**(mw_A_oii_3726_flux_port_rest/2.5)
+    oii_3729_flux_port_deext_rest = 10.0**(mw_A_oii_3729_flux_port_rest/2.5)
+    neiii_3869_flux_port_deext_rest= 10.0**(mw_A_neiii_3869_flux_port_rest/2.5)
+    h_delta_flux_port_deext_rest = 10.0**(mw_A_h_delta_flux_port_rest/2.5)
+    h_gamma_flux_port_deext_rest = 10.0**(mw_A_h_gamma_flux_port_rest/2.5)
+    oiii_4363_flux_port_deext_rest= 10.0**(mw_A_oiii_4363_flux_port_rest/2.5)
+    heii_4685_flux_port_deext_rest = 10.0**(mw_A_heii_4685_flux_port_rest/2.5)
+    ariv_4711_flux_port_deext_rest = 10.0**(mw_A_ariv_4711_flux_port_rest/2.5)
+    h_beta_flux_port_deext_rest = 10.0**(mw_A_h_beta_flux_port_rest/2.5)
+    oiii_4959_flux_port_deext_rest = 10.0**(mw_A_oiii_4959_flux_port_rest/2.5)
+    oiii_5007_flux_port_deext_rest = 10.0**(mw_A_oiii_5007_flux_port_rest/2.5)
+    hei_5876_flux_port_deext_rest = 10.0**(mw_A_hei_5876_flux_port_rest/2.5)
+    oi_6300_flux_port_deext_rest = 10.0**(mw_A_oi_6300_flux_port_rest/2.5)
+    nii_6548_flux_port_deext_rest = 10.0**(mw_A_nii_6548_flux_port_rest/2.5)
+    h_alpha_flux_port_deext_rest  = 10.0**(mw_A_h_alpha_flux_port_rest/2.5)
+    nii_6584_flux_port_deext_rest = 10.0**(mw_A_nii_6584_flux_port_rest/2.5)
+    sii_6717_flux_port_deext_rest = 10.0**(mw_A_sii_6717_flux_port_rest/2.5)
+    sii_6731_flux_port_deext_rest = 10.0**(mw_A_sii_6731_flux_port_rest/2.5)
+
     #output is dextincted avg flux for each line in each galaxy
     oii_3726_flux_ext[i] = oii_3726_flux[i]*oii_3726_deext_rest
     oii_3729_flux_ext[i] = oii_3729_flux[i]*oii_3729_deext_rest
@@ -238,8 +277,26 @@ for i in np.arange(len(galname)):
     sii_6717_flux_ext[i] = sii_6717_flux[i]*sii_6717_deext_rest
     sii_6731_flux_ext[i] = sii_6731_flux[i]*sii_6731_deext_rest
     ariii_7135_flux_ext[i] = ariii_7135_flux[i]*ariii_7135_deext_rest
-    heii_4685_flux_ext[i] = heii_4685_flux[i]*heii_4685_deext_rest
-    oii_3726_flux_port_ext[i] = oii_3726_flux_port[i]*oii_3726_port_deext_rest
+    
+    heii_3203_flux_port_ext[i] = heii_3203_flux_port[i]*heii_3203_flux_port_deext_rest
+    oii_3726_flux_port_ext[i] = oii_3726_flux_port[i]*oii_3726_flux_port_deext_rest
+    oii_3729_flux_port_ext[i] = oii_3729_flux_port[i]*oii_3729_flux_port_deext_rest
+    neiii_3869_flux_port_ext[i] = neiii_3869_flux_port[i]*neiii_3869_flux_port_deext_rest
+    h_delta_flux_port_ext[i] = h_delta_flux_port[i]*h_delta_flux_port_deext_rest
+    h_gamma_flux_port_ext[i] = h_gamma_flux_port[i]*h_gamma_flux_port_deext_rest
+    oiii_4363_flux_port_ext[i] = oiii_4363_flux_port[i]*oiii_4363_flux_port_deext_rest
+    heii_4685_flux_port_ext[i] = heii_4685_flux_port[i]*heii_4685_flux_port_deext_rest
+    ariv_4711_flux_port_ext[i] = ariv_4711_flux_port[i]*ariv_4711_flux_port_deext_rest
+    h_beta_flux_port_ext[i] = h_beta_flux_port[i]*h_beta_flux_port_deext_rest
+    oiii_4959_flux_port_ext[i] = oiii_4959_flux_port[i]*oiii_4959_flux_port_deext_rest
+    oiii_5007_flux_port_ext[i] = oiii_5007_flux_port[i]*oiii_5007_flux_port_deext_rest
+    hei_5876_flux_port_ext[i] = hei_5876_flux_port[i]*hei_5876_flux_port_deext_rest
+    oi_6300_flux_port_ext[i] = oi_6300_flux_port[i]*oi_6300_flux_port_deext_rest
+    nii_6548_flux_port_ext[i] = nii_6548_flux_port[i]*nii_6548_flux_port_deext_rest
+    h_alpha_flux_port_ext[i]  = h_alpha_flux_port[i]*h_alpha_flux_port_deext_rest
+    nii_6584_flux_port_ext[i] = nii_6584_flux_port[i]*nii_6584_flux_port_deext_rest
+    sii_6717_flux_port_ext[i] = sii_6717_flux_port[i]*sii_6717_flux_port_deext_rest
+    sii_6731_flux_port_ext[i] = sii_6731_flux_port[i]*sii_6731_flux_port_deext_rest
 
 #export to fits file
 col1 = fits.Column(name = 'NAME', format = '20A', array=np.array(galname))
@@ -277,18 +334,60 @@ col32 = fits.Column(name = 'sii_6731_flux_ext', format = 'E', array=sii_6731_flu
 col33 = fits.Column(name = 'sii_6731_flux_ext_err', format = 'E', array=sii_6731_flux_err)
 col34 = fits.Column(name = 'ariii_7135_flux_ext', format = 'E', array=ariii_7135_flux_ext)
 col35 = fits.Column(name = 'ariii_7135_flux_ext_err', format = 'E', array=ariii_7135_flux_err)
-col36 = fits.Column(name = 'Flux_HeII_4685_ext', format = 'E', array=heii_4685_flux_ext)
-col37 = fits.Column(name = 'Flux_HeII_4685__ext_Err', format = 'E', array =heii_4685_flux_err)
-col38 = fits.Column(name = 'Flux_OII_3726_ext', format = 'E', array=oii_3726_flux_port_ext)
-col39 = fits.Column(name = 'Flux_OII_3726_ext_Err', format = 'E', array=oii_3726_flux_port_err)
-col40 = fits.Column(name = 'balmer_decrement', format = 'E', array=balm_dec_obs)
-col41 = fits.Column(name = 'balmer_decrement_ext', format = 'E', array=(h_alpha_flux_ext/h_beta_flux_ext))
+
+col36 = fits.Column(name = 'heii_3203_flux_port_ext', format = 'E', array=heii_3203_flux_port_ext)
+col37 = fits.Column(name = 'heii_3203_flux_port_ext_err', format = 'E', array=heii_3203_flux_port_err)
+col38 = fits.Column(name = 'oii_3726_flux_port_ext', format = 'E', array=oii_3726_flux_port_ext)
+col39 = fits.Column(name = 'oii_3726_flux_port_ext_err', format = 'E', array=oii_3726_flux_port_err)
+col40 = fits.Column(name = 'oii_3729_flux_port_ext', format = 'E', array=oii_3729_flux_port_ext)
+col41 = fits.Column(name = 'oii_3729_flux_port_ext_err', format = 'E', array=oii_3729_flux_port_err)
+col42 = fits.Column(name = 'neiii_3869_flux_port_ext', format = 'E', array=neiii_3869_flux_port_ext)
+col43 = fits.Column(name = 'neiii_3869_flux_port_ext_err', format = 'E', array=neiii_3869_flux_port_err)
+col44 = fits.Column(name = 'h_delta_flux_port_ext', format = 'E', array=h_delta_flux_port_ext)
+col45 = fits.Column(name = 'h_delta_flux_port_ext_err', format = 'E', array=h_delta_flux_port_err)
+col46 = fits.Column(name = 'h_gamma_flux_port_ext', format = 'E', array=h_gamma_flux_port_ext)
+col47 = fits.Column(name = 'h_gamma_flux_port_ext_err', format = 'E', array=h_gamma_flux_port_err)
+col48 = fits.Column(name = 'oiii_4363_flux_port_ext', format = 'E', array=oiii_4363_flux_port_ext)
+col49 = fits.Column(name = 'oiii_4363_flux_port_ext_err', format = 'E', array=oiii_4363_flux_port_err)
+col50 = fits.Column(name = 'heii_4685_flux_port_ext', format = 'E', array=heii_4685_flux_port_ext)
+col51 = fits.Column(name = 'heii_4685_flux_port_ext_err', format = 'E', array=heii_4685_flux_port_err)
+col52 = fits.Column(name = 'ariv_4711_flux_port_ext', format = 'E', array=ariv_4711_flux_port_ext)
+col53 = fits.Column(name = 'ariv_4711_flux_port_ext_err', format = 'E', array=ariv_4711_flux_port_err)
+col54 = fits.Column(name = 'h_beta_flux_port_ext', format = 'E', array=h_beta_flux_port_ext)
+col55 = fits.Column(name = 'h_beta_flux_port_ext_err', format = 'E', array=h_beta_flux_port_err)
+col56 = fits.Column(name = 'oiii_4959_flux_port_ext', format = 'E', array=oiii_4959_flux_port_ext)
+col57 = fits.Column(name = 'oiii_4959_flux_port_ext_err', format = 'E', array=oiii_4959_flux_port_err)
+col58 = fits.Column(name = 'oiii_5007_flux_port_ext', format = 'E', array=oiii_5007_flux_port_ext)
+col59 = fits.Column(name = 'oiii_5007_flux_port_ext_err', format = 'E', array=oiii_5007_flux_port_err)
+col60 = fits.Column(name = 'hei_5876_flux_port_ext', format = 'E', array=hei_5876_flux_port_ext)
+col61 = fits.Column(name = 'hei_5876_flux_port_ext_err', format = 'E', array=hei_5876_flux_port_err)
+col62 = fits.Column(name = 'oi_6300_flux_port_ext', format = 'E', array=oi_6300_flux_port_ext)
+col63 = fits.Column(name = 'oi_6300_flux_port_ext_err', format = 'E', array=oi_6300_flux_port_err)
+col64 = fits.Column(name = 'nii_6548_flux_port_ext', format = 'E', array=nii_6548_flux_port_ext)
+col65 = fits.Column(name = 'nii_6548_flux_port_ext_err', format = 'E', array=nii_6548_flux_port_err)
+col66 = fits.Column(name = 'h_alpha_flux_port_ext', format = 'E', array=h_alpha_flux_port_ext)
+col67 = fits.Column(name = 'h_alpha_flux_port_ext_err', format = 'E', array=h_alpha_flux_port_err)
+col68 = fits.Column(name = 'nii_6584_flux_port_ext', format = 'E', array=nii_6584_flux_port_ext)
+col69 = fits.Column(name = 'nii_6584_flux_port_ext_err', format = 'E', array=nii_6584_flux_port_err)
+col70 = fits.Column(name = 'sii_6717_flux_port_ext', format = 'E', array=sii_6717_flux_port_ext)
+col71 = fits.Column(name = 'sii_6717_flux_port_ext_err', format = 'E', array=sii_6717_flux_port_err)
+col72 = fits.Column(name = 'sii_6731_flux_port_ext', format = 'E', array=sii_6731_flux_port_ext)
+col73 = fits.Column(name = 'sii_6731_flux_port_ext_err', format = 'E', array=sii_6731_flux_port_err)
+col74 = fits.Column(name = 'balmer_decrement', format = 'E', array=balm_dec_obs)
+col75 = fits.Column(name = 'balmer_decrement_ext', format = 'E', array=(h_alpha_flux_ext/h_beta_flux_ext))
 
 
 #condense colummns, construct new table, write out results to binary fits
-cols = fits.ColDefs([col1, col2,col3, col4, col5, col6, col7, col8, col9, col10, col11, col12, col13, col14, col15, col16, col17, col18, col19, col20, col21,col22,col23,col24,col25,col26,col27,col28,col29,col30,col31,col32,col33,col34,col35, col36, col37, col38, col39, col40, col41])
-tbhdu = fits.new_table(cols)
-#tbhdu.writeto('RESOLVE_SDSS_dext.fits', clobber=True)
+cols = fits.ColDefs([col1, col2,col3, col4, col5, col6, col7, col8, col9, col10, 
+col11, col12, col13, col14, col15, col16, col17, col18, col19, col20, col21,col22,
+col23,col24,col25,col26,col27,col28,col29,col30,col31,col32,col33,col34,col35, 
+col36, col37, col38, col39, col40, col41, col42, col43, col44, col45, col46, col47,
+col48, col49, col50, col51, col52, col53, col54, col55, col56, col57, col58, col59
+, col60, col61, col62, col63, col64, col65, col66, col67, col68, col69, col70, col71, col72, col73, col74, col75])
+#from astropy.table import Table
+#tbhdu = fits.new_table(cols)
+tbhdu = fits.BinTableHDU.from_columns(cols)
+tbhdu.writeto('RESOLVE_SDSS_full_dext.fits', clobber=True)
 #tbhdu.writeto('RESOLVE_SDSS_dext_dwarf_SNR3.fits', clobber=True)
 #####################################################################
 
