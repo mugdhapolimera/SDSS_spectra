@@ -27,9 +27,9 @@ import pdb
 import pylab
 #pylab.ion()
 
-
+os.chdir('C:\Users\mugdhapolimera\github\SDSS_Spectra')
 #open the file
-hdulist = fits.open('C:\Users\mugdhapolimera\github\izi\RESOLVE_full.fits')
+hdulist = fits.open('ECO_full.fits')
 
 #extract the data
 hdu_data = hdulist[1].data
@@ -387,7 +387,7 @@ col48, col49, col50, col51, col52, col53, col54, col55, col56, col57, col58, col
 #from astropy.table import Table
 #tbhdu = fits.new_table(cols)
 tbhdu = fits.BinTableHDU.from_columns(cols)
-tbhdu.writeto('RESOLVE_SDSS_full_dext.fits', clobber=True)
+tbhdu.writeto('ECO_SDSS_full_dext.fits', clobber=True)
 #tbhdu.writeto('RESOLVE_SDSS_dext_dwarf_SNR3.fits', clobber=True)
 #####################################################################
 
