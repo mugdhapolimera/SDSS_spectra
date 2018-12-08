@@ -17,7 +17,7 @@ import extinction
 import os
 #pylab.ion()
 
-flag = 'mw' #'smc'
+flag = 'smc'
 os.chdir('C:\Users\mugdhapolimera\github\SDSS_Spectra')
 #open the file
 data = pd.read_pickle('RESOLVE_full_raw.pkl')

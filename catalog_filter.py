@@ -24,7 +24,7 @@ Line fluxes and Errors:
 import numpy as np
 import pandas as pd 
 
-inputfile = 'C:/Users/mugdhapolimera/github/izi/RESOLVE_SDSS_full.pkl'
+inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_blend_dext.pkl'
 df = pd.read_pickle(inputfile)
 print (len(df))
 #In RESOLVE Sample filtering
@@ -42,40 +42,41 @@ inobssample = ((grpcz >= 4500.) & (grpcz <= 7000.)) & (((flinsample | (np.log10(
 
 
 #Line FLuxes Filtering
-floor = 0#10**-2
+floor = 10**-3
 ceil = 1e5
 df = df[inobssample]
-
-df = df[~np.isnan(df.h_alpha_flux_ext) & (df.h_alpha_flux_ext > floor)
-        & (df.h_alpha_flux_ext < ceil)]
-df = df[~np.isnan(df.oiii_5007_flux_ext) & (df.oiii_5007_flux_ext > floor) 
-        & (df.oiii_5007_flux_ext < ceil)]
-df = df[~np.isnan(df.nii_6584_flux_ext) & (df.nii_6584_flux_ext > floor)
-        & (df.nii_6584_flux_ext < ceil)]
-df = df[~np.isnan(df.nii_6548_flux_ext) & (df.nii_6548_flux_ext > floor)
-        & (df.nii_6548_flux_ext < ceil)]
-df = df[~np.isnan(df.h_beta_flux_ext) & (df.h_beta_flux_ext > floor)
-        & (df.h_beta_flux_ext < ceil)]
-#df = df[~np.isnan(df.oi_6300_flux_ext) & (df.oi_6300_flux_ext > floor)
-#        & (df.oi_6300_flux_ext < ceil)]
-#df = df[~np.isnan(df.sii_6717_flux_ext) & (df.sii_6717_flux_ext > floor)
-#        & (df.sii_6717_flux_ext < ceil)]
-#df = df[~np.isnan(df.sii_6731_flux_ext) & (df.sii_6731_flux_ext > floor)
-#        & (df.sii_6731_flux_ext < ceil)]
 print len(df)
-df.to_pickle("C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_SDSS_inobssample.pkl")
-
+df = df[~np.isnan(df.h_alpha_flux) & (df.h_alpha_flux > floor)
+        & (df.h_alpha_flux < ceil)]
+df = df[~np.isnan(df.oiii_5007_flux) & (df.oiii_5007_flux > floor) 
+        & (df.oiii_5007_flux < ceil)]
+df = df[~np.isnan(df.nii_6584_flux) & (df.nii_6584_flux > floor)
+        & (df.nii_6584_flux < ceil)]
+#df = df[~np.isnan(df.nii_6548_flux) & (df.nii_6548_flux > floor)
+#        & (df.nii_6548_flux < ceil)]
+df = df[~np.isnan(df.h_beta_flux) & (df.h_beta_flux > floor)
+        & (df.h_beta_flux < ceil)]
+#df = df[~np.isnan(df.oi_6300_flux) & (df.oi_6300_flux > floor)
+#        & (df.oi_6300_flux < ceil)]
+#df = df[~np.isnan(df.sii_6717_flux) & (df.sii_6717_flux > floor)
+#        & (df.sii_6717_flux < ceil)]
+#df = df[~np.isnan(df.sii_6731_flux) & (df.sii_6731_flux > floor)
+#        & (df.sii_6731_flux < ceil)]
 #df = df[~np.isnan(df.heii_4685_flux_port_ext) & 
 #        (df.heii_4685_flux_port_ext > floor) & (df.heii_4685_flux_port_ext < ceil)]
+print len(df)
+df = df[(df.h_beta_flux/df.h_beta_flux_err >= 3)]
+df = df[df.h_alpha_flux/df.h_alpha_flux_err >= 3]
+df = df[df.oiii_5007_flux/df.oiii_5007_flux_err >=3 ]
+df = df[df.nii_6584_flux/df.nii_6584_flux_err >= 3 ]
+#df = df[df.nii_6548_flux/df.nii_6548_flux_err >= 2 ]
+#df = df[df.oi_6300_flux/df.oi_6300_flux_err >= 2 ]
+#df = df[df.sii_6717_flux/df.sii_6717_flux_err >=2 ]
+#df = df[df.sii_6731_flux/df.sii_6731_flux_err >=2 ]
+#print len(df)
+#flags = pd.read_csv('C:/Users/mugdhapolimera/github/BPT/resolve_emlineclass_bpt1.csv')
+#flags.index = flags['galname']
 
-df = df[(df.h_beta_flux_ext/df.h_beta_flux_ext_err >= 3)]
-df = df[df.h_alpha_flux_ext/df.h_alpha_flux_ext_err >= 2]
-df = df[df.oiii_5007_flux_ext/df.oiii_5007_flux_ext_err >=2 ]
-df = df[df.nii_6584_flux_ext/df.nii_6584_flux_ext_err >= 2 ]
-df = df[df.nii_6548_flux_ext/df.nii_6548_flux_ext_err >= 2 ]
-df = df[df.oi_6300_flux_ext/df.oi_6300_flux_ext_err >= 2 ]
-df = df[df.sii_6717_flux_ext/df.sii_6717_flux_ext_err >=2 ]
-df = df[df.sii_6731_flux_ext/df.sii_6731_flux_ext_err >=2 ]
-
-#df.to_pickle("C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_SDSS_filtered.pkl")
-
+#df = df[flags['defstarform']]
+df.to_pickle("C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_filter.pkl")
+print len(df)

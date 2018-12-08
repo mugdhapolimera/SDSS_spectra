@@ -12,34 +12,38 @@ galaxy mass.
     - A linear combination of SMC and MW extinction for galaxies with 
       10^9 < M < 10^10
                 A = logM % 9 , B = 1-A
-                Dereddened flux = A * SMC extinction + B * MW extinction
+                Dereddened flux = B * SMC extinction + A * MW extinction
 
 @author: mugdhapolimera
 """
-from astropy.table import Table
+#from astropy.table import Table
 import numpy as np
 import pandas as pd
-smcfile = 'C:\Users\mugdhapolimera\github\SDSS_Spectra\RESOLVE_SDSS_full_smcdext.fits'
-smc0 = Table.read(smcfile, format='fits')
-smc = smc0.to_pandas()
-smc.index = smc.NAME
-mwfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_SDSS_full_dext.fits'
-mw0 = Table.read(mwfile, format='fits')
-mw = mw0.to_pandas()
-mw.index = mw.NAME
-resolve = pd.read_csv('RESOLVE_liveOctober2018.csv')
-resolve.index = resolve.name
+smcfile = 'C:\Users\mugdhapolimera\github\SDSS_Spectra\RESOLVE_full_smcdext.pkl'
+#smc0 = Table.read(smcfile, format='fits')
+smc = pd.read_pickle(smcfile)
+#smc.index = smc.NAME
+mwfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_mwdext.pkl'
+#mw0 = Table.read(mwfile, format='fits')
+mw = pd.read_pickle(mwfile)
+#mw.index = mw.NAME
+#resolve = pd.read_csv('RESOLVE_liveOctober2018.csv')
+#resolve.index = resolve.name
 ext_corr = smc.copy()
 
 for gal in smc.index.values:
-    if resolve.logmstar.loc[gal] < 9:
+    print gal    
+    if smc.logmstar.loc[gal] < 9:
         ext_corr.loc[gal] = smc.loc[gal]
-    elif resolve.logmstar.loc[gal] > 10:
+    elif smc.logmstar.loc[gal] > 10:
         ext_corr.loc[gal] = mw.loc[gal]
     else:
-        A = resolve.logmstar.loc[gal] % 9
+        A = smc.logmstar.loc[gal] % 9
         B = 1 - A
-        print 'Blending for Galaxy ', gal, A, B
-        print smc.loc[gal][1:73]
+        #print 'Blending for Galaxy ', gal, A, B
+        #print smc.loc[gal][1:73]
         ext_corr.loc[gal][1:73] = A * smc.loc[gal][1:73] + B * mw.loc[gal][1:73]
 print ext_corr
+ext_corr.to_pickle('RESOLVE_full_blend_dext.pkl')
+#ext_corr.index = np.array(ext_corr['name'])
+#dfres = pd.merge(resolve,ext_corr,how="left",left_index=True,right_index=True)
