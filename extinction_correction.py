@@ -20,7 +20,7 @@ import os
 flag = 'smc'
 os.chdir('C:\Users\mugdhapolimera\github\SDSS_Spectra')
 #open the file
-data = pd.read_pickle('RESOLVE_full_raw.pkl')
+data = pd.read_pickle('ECO_full_raw.pkl')
 wavelengths = {'oii_3726_flux' : 3726, 'oii_3729_flux' : 3729, 
                'neiii_3869_flux' : 3869, 'h_delta_flux' : 4101, 
                'h_gamma_flux' : 4340, 'oiii_4363_flux' : 4363, 
@@ -42,10 +42,10 @@ wavelengths = {'oii_3726_flux' : 3726, 'oii_3729_flux' : 3729,
 
 if flag =='mw':
     extinction_func = extinction.mwextinction
-    outputfile = 'RESOLVE_full_mwdext.pkl'
+    outputfile = 'ECO_full_mwdext.pkl'
 if flag =='smc':
     extinction_func = extinction.smcextinction
-    outputfile = 'RESOLVE_full_smcdext.pkl'
+    outputfile = 'ECO_full_smcdext.pkl'
 Alambda_Ebv= {}    
 for line in wavelengths.keys():               
     Alambda_Ebv[line] = extinction_func(1/(wavelengths[line]*10**-4))
@@ -72,22 +72,23 @@ mw_A_atmwlam  = np.zeros(len(EBV_excess))
 #if 'flux_ratio_2c' in lines:
 #    lines.pop(np.where('flux_ratio_2c' in lines)[0])
 #print lines
-for galname in data.index.values:
-    print galname
-    #factor to relate each mw lam and color excess    
-    #ext['Al_Ebv']*EBV_excess[i] #for particular galaxy
-    #there is a mw_A_atmwlam for each galaxy, this index is the same for all
-    
-    #if np.isfinite(EBV_excess.loc[galname]): 
-        #Extinction for each line in a galaxy is given by
-        # A_lambda_gal = A_lambda/E(B-V) * E(B-V)_gal
-    Alambda_gal = {line : Alambda_Ebv[line]*EBV_excess.loc[galname] \
-                            for line in wavelengths.keys()}
-            #output is dextincted avg flux for each line in each galaxy
-    for line in wavelengths.keys():
-         
-         data_dext[line].loc[galname] = (data[line].loc[galname]*
-                                     10.0**(Alambda_gal[line]/2.5))
-         
-data_dext.to_pickle(outputfile)
+#for galname in data.index.values:
+galname= 'ECO00002'
+print galname
+#factor to relate each mw lam and color excess    
+#ext['Al_Ebv']*EBV_excess[i] #for particular galaxy
+#there is a mw_A_atmwlam for each galaxy, this index is the same for all
+
+#if np.isfinite(EBV_excess.loc[galname]): 
+    #Extinction for each line in a galaxy is given by
+    # A_lambda_gal = A_lambda/E(B-V) * E(B-V)_gal
+Alambda_gal = {line : Alambda_Ebv[line]*EBV_excess.loc[galname] \
+                        for line in wavelengths.keys()}
+        #output is dextincted avg flux for each line in each galaxy
+for line in wavelengths.keys():
+     
+     data_dext[line].loc[galname] = (data[line].loc[galname]*
+                                 10.0**(Alambda_gal[line]/2.5))
+print data_dext.loc[galname]         
+#data_dext.to_pickle(outputfile)
 #####################################################################
