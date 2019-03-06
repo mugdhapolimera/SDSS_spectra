@@ -78,7 +78,6 @@ float_formatter = lambda x: "%.2f" % x
 xticks = np.array([7.8, 8.0, 8.2, 8.4, 8.6, 8.8, 9.0])
 N2 = 1.754*xticks - 15.614
 N2_label = ["%.2f" % z for z in N2]
-ax2.set_xticklabels(N2_label)
 N2_20 = 1.754*(np.log10(0.2)+8.76) - 15.614
 N2_30 = 1.754*(np.log10(0.3)+8.76) - 15.614
 N2_40 = 1.754*(np.log10(0.4)+8.76) - 15.614
@@ -86,6 +85,7 @@ N2_40 = 1.754*(np.log10(0.4)+8.76) - 15.614
 fig = plt.figure()
 ax1 = fig.add_subplot(122)
 ax2 = ax1.twiny()
+ax2.set_xticklabels(N2_label)
 ax1.plot(np.arange(7.8,11),np.arange(7.8,11), "r", linewidth = 3)
 ax1.plot(PP04_12logOH, iziout["Estimate"], 'bo', alpha = 0.25)
 ax1.set_xlim(7.8,9)
@@ -137,7 +137,8 @@ ax1.text(y_solar_30[0]-0.05, 8.9, r'[NII]/H$\alpha$ = ' + "%0.2f" % N2_30,
 ax1.text(y_solar_40[0]-0.05, 8.9, r'[NII]/H$\alpha$ = ' + "%0.2f" % N2_40,
          fontsize=14, color='k', rotation = 'vertical')
 #ax1.set_title("NB(Levesque10) vs PP04", y=1.1)
-ax1.set_ylabel("12 + log(O/H)  (using Levesque 2010)", size = 15)
+#ax1.set_ylabel("12 + log(O/H)  (using Levesque 2010)", size = 15)
+ax1.set_ylabel("12 + log(O/H)  (using grid with Hydrogen Density)", size = 15)
 ax1.set_xlabel(r"12 + log(O/H)  (using [NII]/H$\alpha$)", size = 15)
 ax2.set_xlabel(r"[NII]/H$\alpha$", size = 15)
 #ax1.plot(np.arange(7.7,11),np.arange(-1.3,0.5), "r")
