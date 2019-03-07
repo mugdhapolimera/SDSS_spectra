@@ -16,6 +16,6 @@ speclist  = open('speclist.txt', 'w')
 
 for plate, mjd, fiberid in zip(sdss['plate'],sdss['mjd'],sdss['fiberid']):
        
-    speclist.write(String.format("%04d/spec-%04d-%d-%04d.fits \n",(plate, plate, mjd, fiberid))
+    speclist.write("%04d/spec-%04d-%d-%04d.fits \n" %(plate, plate, mjd, fiberid))
 
 speclist.close()
