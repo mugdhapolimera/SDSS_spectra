@@ -2,8 +2,8 @@ import numpy as np
 import subprocess
 import os
 import glob
-os.chdir(r'C:\Users\mugdhapolimera\github\SDSS_Spectra\xray')
-datfold = r'..\xray_imgs\xmm3'
+#os.chdir(r'C:\Users\mugdhapolimera\github\SDSS_Spectra\xray')
+datfold = './xray_imgs/'
 def getxmmdata(obsnumb):
     '''
     Interfacing with the online server for XMM-Newton
@@ -11,7 +11,8 @@ def getxmmdata(obsnumb):
     
     #fold = obsnumb+'/'
     #setting up the unix commands
-    obsnumb = str(obsnumb)
+    obsnumb = str(obsnumb).zfill(10)
+    
     m1comm =  'curl -o' +datfold+'m1/'+obsnumb+'m1.tar "http://nxsa.esac.esa.int/nxsa-sl/servlet/data-action-aio?obsno='+obsnumb+'&instname=M1&extension=FTZ&name=IMAGE_&level=PPS" '
     m2comm =  'curl -o' +datfold+'m2/'+obsnumb+'m2.tar "http://nxsa.esac.esa.int/nxsa-sl/servlet/data-action-aio?obsno='+obsnumb+'&instname=M2&extension=FTZ&name=IMAGE_&level=PPS" '
     pncomm =  'curl -o' +datfold+'pn/'+obsnumb+'pn.tar "http://nxsa.esac.esa.int/nxsa-sl/servlet/data-action-aio?obsno='+obsnumb+'&instname=PN&extension=FTZ&name=IMAGE_&level=PPS" '
@@ -21,7 +22,7 @@ def getxmmdata(obsnumb):
     ppn = subprocess.Popen(pncomm, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     #sending the command for download
     outm1, errm1 = pm1.communicate()
-    print m1comm, pm1
+    print m1comm
     outm2, errm2 = pm2.communicate()
     outpn, errpn = ppn.communicate()
 #
@@ -41,10 +42,14 @@ def extractdata(fold):
     '''
     For extracting tars in a given folder
     '''
-    fils = glob.glob(fold+'/*.tar')
+    os.chdir(fold)
+    fils = glob.glob('./*.tar')
+    print fils
     for fil in fils:
         comm = 'tar xopf '+fil
         p = subprocess.Popen(comm, shell=True, stdout=subprocess.PIPE, stderr = subprocess.PIPE)
         out = p.communicate()
+        print out
 
-runit(goodobsalltimes)
+#runit(goodobsalltimes)
+extractdata('./xray_imgs/pn')

@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from scipy import ndimage as ndi
 from skimage import feature
 from skimage.filters import roberts,sobel, scharr, prewitt
+import pandas as pd
 #from astimage import *
 
 plt.rc('font',family='serif')
@@ -23,21 +24,23 @@ def conv_ra(ra):
             copra[i] =-360+copra[i]
     return (copra)*(-1)
 
-ragsw,decgsw = np.loadtxt('C:\Users\mugdhapolimera\github\SDSS_Spectra\RESOLVE_filter_coords2.txt',unpack = True) #galaxies with BPT SNR > 2
+full = pd.read_csv(r'../ECO+RESOLVE_filter.csv') #galaxies with BPT SNR > 2
+ragsw,decgsw = np.array(full['radeg']), np.array(full['dedeg'])
+
 '''
 -*8000*.ftz are the full-field images
 -Need them for the three diff. X-ray cameras
 '''
-xmm3_m1 = glob.glob('xray_imgs/xmm3/m1/*/pps/*8000*.FTZ')
-uniq_m1, uniq_ind_m1=np.unique([xmm3_m1[i].split('/')[3] for i in range(len(xmm3_m1))],return_index=True)
+xmm3_m1 = glob.glob('xray_imgs/m1_unzip/*/pps/*8000*.FTZ')
+uniq_m1, uniq_ind_m1=np.unique([xmm3_m1[i].split('/')[2] for i in range(len(xmm3_m1))],return_index=True)
 xmm3_m1 = np.array(xmm3_m1)[uniq_ind_m1] #only want one field per obs
 
-xmm3_m2 = glob.glob('xray_imgs/xmm3/m2/*/pps/*8000*.FTZ')
-uniq_m2, uniq_ind_m2=np.unique([xmm3_m2[i].split('/')[3] for i in range(len(xmm3_m2))],return_index=True)
+xmm3_m2 = glob.glob('xray_imgs/m2/*/pps/*8000*.FTZ')
+uniq_m2, uniq_ind_m2=np.unique([xmm3_m2[i].split('/')[2] for i in range(len(xmm3_m2))],return_index=True)
 xmm3_m2 = np.array(xmm3_m2)[uniq_ind_m2] #only want one field per obs2
 
-xmm3_pn = glob.glob('xray_imgs/xmm3/pn/*/pps/*8000*.FTZ')
-uniq_pn, uniq_ind_pn=np.unique([xmm3_pn[i].split('/')[3] for i in range(len(xmm3_pn))],return_index=True)
+xmm3_pn = glob.glob('xray_imgs/pn/*/pps/*8000*.FTZ')
+uniq_pn, uniq_ind_pn=np.unique([xmm3_pn[i].split('/')[2] for i in range(len(xmm3_pn))],return_index=True)
 xmm3_pn = np.array(xmm3_pn)[uniq_ind_pn] #only want one field per obs
 allimglists = np.hstack([xmm3_m1, xmm3_m2, xmm3_pn])
 
@@ -64,6 +67,7 @@ def getxraycov_byimg(imglist, racomp, deccomp):
     for j in range(len(racomp)):
         if gswinds[j] not in matchedgals:
             unmatchedgals.append(gswinds[j])
+    print matchedgals, unmatchedgals
     return matchedgals, np.array(matchedfields), unmatchedgals, np.array(ra_centarr), np.array(dec_centarr)
 class Mosaic:
     '''
@@ -150,23 +154,29 @@ def getxrcov(imglist, ra, dec, fname):
     '''
     matched_ = getxraycov_byimg(imglist, ra, dec)
     matched_gals, matched_fields,unmatched_gals,racent, deccent = matched_
-    np.savetxt('catalogs/xraycov/matched_gals_'+fname+'_xrcovg_fields_set.txt', matched_gals)
-    np.savetxt('catalogs/xraycov/unmatched_gals_'+fname+'_xrcovg_fields_set.txt', unmatched_gals)#
-    np.savetxt('catalogs/xraycov/matchedfields_'+fname+'_xrcovg_fields_set.txt', matched_fields)
-    np.savetxt('catalogs/xraycov/racent_'+fname+'_xrcovg_fields_set.txt', racent)#
-    np.savetxt('catalogs/xraycov/deccent_' +fname+'_xrcovg_fields_set.txt', deccent)
+    print matched_gals
+#    np.savetxt('catalogs/xraycov/matched_gals_'+fname+'_xrcovg_fields_set.txt', matched_gals)
+#    np.savetxt('catalogs/xraycov/unmatched_gals_'+fname+'_xrcovg_fields_set.txt', unmatched_gals)#
+#    np.savetxt('catalogs/xraycov/matchedfields_'+fname+'_xrcovg_fields_set.txt', matched_fields)
+#    np.savetxt('catalogs/xraycov/racent_'+fname+'_xrcovg_fields_set.txt', racent)#
+#    np.savetxt('catalogs/xraycov/deccent_' +fname+'_xrcovg_fields_set.txt', deccent)
+    np.savetxt('matched_gals_'+fname+'_xrcovg_fields_set.txt', matched_gals)
+    np.savetxt('unmatched_gals_'+fname+'_xrcovg_fields_set.txt', unmatched_gals)#
+    np.savetxt('matchedfields_'+fname+'_xrcovg_fields_set.txt', matched_fields)
+    np.savetxt('racent_'+fname+'_xrcovg_fields_set.txt', racent)#
+    np.savetxt('deccent_' +fname+'_xrcovg_fields_set.txt', deccent)
 
-
-getxrcov(allimglists, ragsw, decgsw, fname,'xmm3') #to run the main parts
+fname = 'full'
+matchedgals, matchedfields, unmatchedgals, ra_centarr, dec_centarr = getxrcov(allimglists, ragsw, decgsw, fname) #to run the main parts
     
 '''
 Below: If such X-ray coverage is already done, easier to load certain information for plotting
 '''
-matched_gals =np.int64(np.loadtxt('catalogs/xraycov/matched_gals_xmm3_xrcovg_fields_set.txt'))
-unmatched_gals = np.int64(np.loadtxt('catalogs/xraycov/unmatched_gals_xmm3_xrcovg_fields_set.txt'))
-matched_fields = np.int64(np.loadtxt('catalogs/xraycov/matchedfields_xmm3_xrcovg_fields_set.txt'))
-racent = np.int64(np.loadtxt('./catalogs/xraycov/racent_xmm3_xrcovg_fields_set.txt'))
-deccent = np.int64(np.loadtxt('./catalogs/xraycov/deccent_xmm3_xrcovg_fields_set.txt'))
+matched_gals =np.int64(np.loadtxt('matched_gals_full_xrcovg_fields_set.txt'))
+unmatched_gals = np.int64(np.loadtxt('unmatched_gals_full_xrcovg_fields_set.txt'))
+matched_fields = np.int64(np.loadtxt('matchedfields_full_xrcovg_fields_set.txt'))
+racent = np.int64(np.loadtxt('racent_full_xrcovg_fields_set.txt'))
+deccent = np.int64(np.loadtxt('deccent_full_xrcovg_fields_set.txt'))
 
 mydpi=48
 def plotcov( matched_fields, save=False,fname=''):
@@ -255,6 +265,6 @@ def plotstuff(im, save=False):
     plt.xlabel('RA',fontsize=20)
     plt.ylabel('Dec',fontsize=20)
     plt.tight_layout()
-#plotstuff(allimglists[0])
+plotstuff(allimglists[0])
 #plotcov(mosaics, matched_fields, save=False)
 
