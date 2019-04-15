@@ -17,8 +17,8 @@ import extinction
 import os
 #pylab.ion()
 
-#flag = 'smc'
-flag = 'mw'
+flag = 'smc'
+#``flag = 'mw'
 #os.chdir('C:\Users\mugdhapolimera\github\SDSS_Spectra')
 #os.chdir('./github/SDSS_Spectra')
 #open the file
