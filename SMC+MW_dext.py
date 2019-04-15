@@ -19,11 +19,11 @@ galaxy mass.
 #from astropy.table import Table
 import numpy as np
 import pandas as pd
-smcfile = 'C:\Users\mugdhapolimera\github\SDSS_Spectra\ECO_full_smcdext.pkl'
+smcfile = 'C:\Users\mugdhapolimera\github\SDSS_Spectra\RESOLVE_full_smcdext_new.pkl'
 #smc0 = Table.read(smcfile, format='fits')
 smc = pd.read_pickle(smcfile)
 #smc.index = smc.NAME
-mwfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO_full_mwdext.pkl'
+mwfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_mwdext_new.pkl'
 #mw0 = Table.read(mwfile, format='fits')
 mw = pd.read_pickle(mwfile)
 #mw.index = mw.NAME
@@ -42,9 +42,12 @@ for gal in smc.index.values:
         B = 1 - A
         #print 'Blending for Galaxy ', gal, A, B
         #print smc.loc[gal][1:73]
-        if ~np.isnan(np.array(ext_corr.loc[gal][96:172],dtype = float)).all():
-            ext_corr.loc[gal][96:172] = A * smc.loc[gal][96:172] + B * mw.loc[gal][96:172]
+        #if ~np.isnan(np.array(ext_corr.loc[gal][96:172],dtype = float)).all():
+        #    ext_corr.loc[gal][96:172] = A * smc.loc[gal][96:172] + B * mw.loc[gal][96:172]
+        if ~np.isnan(np.array(ext_corr.loc[gal][148:224],dtype = float)).all():
+            ext_corr.loc[gal][148:224] = A * smc.loc[gal][148:224] + B * mw.loc[gal][148:224]
 print ext_corr
-ext_corr.to_pickle('ECO_full_blend_dext.pkl')
+ext_corr.to_pickle('RESOLVE_full_blend_dext_new.pkl')
+ext_corr.to_csv('RESOLVE_full_blend_dext_new.csv')
 #ext_corr.index = np.array(ext_corr['name'])
 #dfres = pd.merge(resolve,ext_corr,how="left",left_index=True,right_index=True)

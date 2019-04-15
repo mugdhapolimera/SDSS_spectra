@@ -22,7 +22,7 @@ flag = 'mw'
 #os.chdir('C:\Users\mugdhapolimera\github\SDSS_Spectra')
 #os.chdir('./github/SDSS_Spectra')
 #open the file
-data = pd.read_pickle('RESOLVE_full_raw.pkl')
+data = pd.read_pickle('ECO_full_raw.pkl')
 wavelengths = {'oii_3726_flux' : 3726, 'oii_3729_flux' : 3729, 
                'neiii_3869_flux' : 3869, 'h_delta_flux' : 4101, 
                'h_gamma_flux' : 4340, 'oiii_4363_flux' : 4363, 
@@ -31,7 +31,9 @@ wavelengths = {'oii_3726_flux' : 3726, 'oii_3729_flux' : 3729,
                'oi_6300_flux' : 6300, 'nii_6548_flux' : 6548, 
                'h_alpha_flux' : 6564, 'nii_6584_flux' : 6584, 
                'sii_6717_flux' : 6717, 'sii_6731_flux' : 6731,
-               'ariii7135_flux' : 7135, 'Flux_HeII_3203' : 3203, 
+               'ariii7135_flux' : 7135}
+
+''', 'Flux_HeII_3203' : 3203, 
                'Flux_OII_3726' : 3726, 'Flux_OII_3728' : 3728, 
                'Flux_NeIII_3868' : 3868, 'Flux_Hd_4101' : 4101, 
                'Flux_Hg_4340' : 4340, 'Flux_OIII_4363' : 4363, 
@@ -41,13 +43,13 @@ wavelengths = {'oii_3726_flux' : 3726, 'oii_3729_flux' : 3729,
                'Flux_OI_6300' : 6300, 'Flux_NII_6547' : 6547,
                'Flux_Ha_6562' : 6562, 'Flux_NII_6583' : 6583,
                'Flux_SII_6716' : 6716, 'Flux_SII_6730' : 6731}
-
+'''
 if flag =='mw':
     extinction_func = extinction.mwextinction
-    outputfile = 'RESOLVE_full_mwdext_new.pkl'
+    outputfile = 'ECO_full_mwdext_new.pkl'
 if flag =='smc':
     extinction_func = extinction.smcextinction
-    outputfile = 'RESOLVE_full_smcdext_new.pkl'
+    outputfile = 'ECO_full_smcdext_new.pkl'
 Alambda_Ebv= {}    
 for line in wavelengths.keys():               
     Alambda_Ebv[line] = extinction_func(1/(wavelengths[line]*10**-4))
@@ -97,12 +99,12 @@ for galname in data.index.values:
                                      10.0**(Alambda_gal[line]/2.5))
          X = 10**(Alambda_gal[line]/2.5)
          X_err = 2.303 * X * Alambda_gal_err[line]
-         if line[0] == 'F':
-             line_err = data[line+'_Err'].loc[galname]/data[line].loc[galname]
-             data_dext[line+'_Err'].loc[galname] = data_dext[line].loc[galname]*(line_err**2 + (X_err/X)**2)**0.5
-         else:
-             line_err = data[line+'_err'].loc[galname]/data[line].loc[galname]
-             data_dext[line+'_err'].loc[galname] = data_dext[line].loc[galname]*(line_err**2 + (X_err/X)**2)**0.5
+#         if line[0] == 'F':
+#             line_err = data[line+'_Err'].loc[galname]/data[line].loc[galname]
+#             data_dext[line+'_Err'].loc[galname] = data_dext[line].loc[galname]*(line_err**2 + (X_err/X)**2)**0.5
+ #        else:
+         line_err = data[line+'_err'].loc[galname]/data[line].loc[galname]
+         data_dext[line+'_err'].loc[galname] = data_dext[line].loc[galname]*(line_err**2 + (X_err/X)**2)**0.5
                                  
 #print data_dext.loc[galname]         
 data_dext.to_pickle(outputfile)

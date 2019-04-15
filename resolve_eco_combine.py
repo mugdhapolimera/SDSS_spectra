@@ -10,13 +10,13 @@ import os
 
 os.chdir('C:/Users/mugdhapolimera/github/SDSS_Spectra')
 
-resolve = pd.read_pickle('RESOLVE_filter.pkl')
-eco = pd.read_pickle('ECO_filter.pkl')
+resolve = pd.read_pickle('RESOLVE_filter_new.pkl')
+eco = pd.read_pickle('ECO_filter_new.pkl')
 eco = eco.rename(columns = {"name": "NAME"})
 
 full = eco.copy()
 notineco = (resolve['econame'] == 'notineco')
 full = full.append(resolve[notineco])
         
-full.to_pickle('ECO+RESOLVE_filter.pkl')
-full.to_csv('ECO+RESOLVE_filter.csv')
+full.to_pickle('ECO+RESOLVE_filter_new.pkl')
+full.to_csv('ECO+RESOLVE_filter_new.csv')
