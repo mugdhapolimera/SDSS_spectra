@@ -17,7 +17,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 #rdat = pd.read_pickle("C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_bpt1filter_new.pkl")
-rdat = pd.read_pickle("C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_filter_new.pkl")
+rdat = pd.read_pickle("C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO+RESOLVE_filter_new.pkl")
 # a simple Te method calib. is the NII/Halpha PP04, for ???2.5 < N2 < ???0.3
 # Pettini & Pagel 2004
 
@@ -55,7 +55,7 @@ PP04_12logOH_v2[selbd] = (-99.)
 
 
 
-iziout = np.genfromtxt("C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_bpass_full_nicholls.txt", dtype = None, names = ["name", 
+iziout = np.genfromtxt("C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE+ECO_bpass_full_nicholls.txt", dtype = None, names = ["name", 
                                                                                         "Estimate", "err_up", "err_down"])
 #iziout = np.genfromtxt("C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_bpass_bpt1filter_SEL_grovesdep.txt", dtype = None, names = ["name", 
 #                                                                                         "Estimate", "err_up", "err_down"])
@@ -66,7 +66,7 @@ iziout = np.genfromtxt("C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_bpas
 #                                                                                                                                 "Estimate", "err_up", "err_down"])
 iziout2 = np.genfromtxt("C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_bpass_full_nicholls+jenkins.txt", dtype = None, names = ["name", 
                                                                                                                                  "Estimate", "err_up", "err_down"])
-#bpt = pd.read_csv('resolve_emlineclass_filter_new.csv')
+bpt = pd.read_csv('eco+resolve_emlineclass_filter.csv')
 iziout2['Estimate']+=8.76
 iziout['Estimate']+=8.76
 matchi = np.arange(len(iziout))
@@ -123,8 +123,8 @@ N2 = 1.754*xticks - 15.614
 N2_label = ["%.2f" % z for z in N2]
 ax2.set_xticklabels(N2_label)
 ax1.plot(PP04_12logOH, iziout["Estimate"], 'bo', markersize = 5, alpha = 0.2)
-#ax1.plot(PP04_12logOH[list(bpt['sftoagn'])], iziout["Estimate"][bpt['sftoagn']], 
-#         'rs', markersize = 5)
+ax1.plot(PP04_12logOH[list(bpt['sftoagn'])], iziout["Estimate"][bpt['sftoagn']], 
+         'rs', markersize = 5)
 ax1.set_xlim(7.4,9.2)
 ax1.set_ylim(7.4,9.2)
 ax1.plot(x_solar, y_solar_40,'k-.', linewidth = 1)

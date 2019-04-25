@@ -24,27 +24,42 @@ Line fluxes and Errors:
 import numpy as np
 import pandas as pd 
 
-inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO_full_blend_dext_new.pkl'
-df = pd.read_pickle(inputfile)
-print (len(df))
+eco = 1
+resolve = 0
+if eco: 
+    inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO_full_blend_dext_new.pkl'
+    outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO_filter_new"
+    df = pd.read_pickle(inputfile)
+    print (len(df))
+    mgas = df.logmgas
+    mstars = df.logmstar
+    mbary = 10**mgas + 10**mstars
+    inobssample = (((df.grpcz >= 3000.) & (df.grpcz <= 7000.)) & \
+    ((np.log10(mbary) > 9.2))) #(df.absrmag < -17.3) & 
+
+
 #In RESOLVE Sample filtering
-#ra=df.radeg
-#dec=df.dedeg
-#flinsample = df.fl_insample
-#grpcz = df.grpcz
-#cz = df.cz
-#infall = (ra > 22*15.) | (ra < 3*15.)
-#inspring = (ra > 8.75*15.) & (ra < 15.75*15.)
-#mgas = df.logmgas
-#mstars = df.logmstar
-#mbary = 10**mgas + 10**mstars
-#inobssample = ((grpcz >= 4500.) & (grpcz <= 7000.)) & (((flinsample | (np.log10(mbary) > 9.0)) & infall) | ((flinsample | (np.log10(mbary) > 9.2)) & inspring))
+if resolve:
+    inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_blend_dext_new.pkl'
+    outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_filter_new"
+    df = pd.read_pickle(inputfile)
+    ra=df.radeg
+    dec=df.dedeg
+    flinsample = df.fl_insample
+    grpcz = df.grpcz
+    cz = df.cz
+    infall = (ra > 22*15.) | (ra < 3*15.)
+    inspring = (ra > 8.75*15.) & (ra < 15.75*15.)
+    mgas = df.logmgas
+    mstars = df.logmstar
+    mbary = 10**mgas + 10**mstars
+#    inobssample = ((grpcz >= 4500.) & (grpcz <= 7000.)) & (((flinsample | (np.log10(mbary) > 9.0)) & infall) | ((flinsample | (np.log10(mbary) > 9.2)) & inspring))
+    inobssample = (((grpcz >= 4500.) & (grpcz <= 7000.)) & \
+    ((((np.log10(mbary) > 9.0)) & infall) | \
+     (((np.log10(mbary) > 9.2)) & inspring)))
+
+
 #for ECO
-mgas = df.logmgas
-mstars = df.logmstar
-mbary = 10**mgas + 10**mstars
-#inobssample = ((df.grpcz >= 3000.) & (df.grpcz <= 7000.)) & \
-inobssample = ((df.absrmagcorr < -17.3) | (np.log10(mbary) > 9.2))
 
 #Line FLuxes Filtering
 floor = 10**-3
@@ -83,6 +98,6 @@ print len(df)
 #flags.index = flags['galname']
 
 #df = df[flags['defstarform']]
-#df.to_pickle("C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO_filter_new.pkl")
-#df.to_csv("C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO_filter_new.csv")
+df.to_pickle(outputfile+".pkl")
+df.to_csv(outputfile+".csv")
 print len(df)
