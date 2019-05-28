@@ -24,8 +24,8 @@ Line fluxes and Errors:
 import numpy as np
 import pandas as pd 
 
-eco = 1
-resolve = 0
+eco = 0
+resolve = 1
 if eco: 
     inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO_full_blend_dext_new.pkl'
     outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO_filter_new"
@@ -43,6 +43,7 @@ if resolve:
     inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_blend_dext_new.pkl'
     outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_filter_new"
     df = pd.read_pickle(inputfile)
+    print len(df)
     ra=df.radeg
     dec=df.dedeg
     flinsample = df.fl_insample
@@ -55,8 +56,7 @@ if resolve:
     mbary = 10**mgas + 10**mstars
 #    inobssample = ((grpcz >= 4500.) & (grpcz <= 7000.)) & (((flinsample | (np.log10(mbary) > 9.0)) & infall) | ((flinsample | (np.log10(mbary) > 9.2)) & inspring))
     inobssample = (((grpcz >= 4500.) & (grpcz <= 7000.)) & \
-    ((((np.log10(mbary) > 9.0)) & infall) | \
-     (((np.log10(mbary) > 9.2)) & inspring)))
+    (np.log10(mbary) > 9.2))
 
 
 #for ECO
@@ -90,9 +90,10 @@ df = df[df.h_alpha_flux/df.h_alpha_flux_err >= 3]
 df = df[df.oiii_5007_flux/df.oiii_5007_flux_err >=3 ]
 df = df[df.nii_6584_flux/df.nii_6584_flux_err >= 3 ]
 df = df[df.nii_6548_flux/df.nii_6548_flux_err >= 3 ]
-df = df[df.oi_6300_flux/df.oi_6300_flux_err >= 2 ]
-df = df[df.sii_6717_flux/df.sii_6717_flux_err >=2 ]
-df = df[df.sii_6731_flux/df.sii_6731_flux_err >=2 ]
+df = df[df.sii_6717_flux/df.sii_6717_flux_err >=3 ]
+df = df[df.sii_6731_flux/df.sii_6731_flux_err >=3 ]
+print len(df)
+df = df[df.oi_6300_flux/df.oi_6300_flux_err >= 3 ]
 print len(df)
 #flags = pd.read_csv('C:/Users/mugdhapolimera/github/BPT/resolve_emlineclass_bpt1_new.csv')
 #flags.index = flags['galname']
@@ -100,4 +101,4 @@ print len(df)
 #df = df[flags['defstarform']]
 df.to_pickle(outputfile+".pkl")
 df.to_csv(outputfile+".csv")
-print len(df)
+#print len(df)

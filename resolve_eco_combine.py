@@ -20,3 +20,4 @@ full = full.append(resolve[notineco])
         
 full.to_pickle('ECO+RESOLVE_filter_new.pkl')
 full.to_csv('ECO+RESOLVE_filter_new.csv')
+print len(full)

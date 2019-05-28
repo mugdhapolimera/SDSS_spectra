@@ -33,24 +33,26 @@ import pandas as pd
 import matplotlib.pyplot as plt
 eco = 1
 
-inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO_full_blend_dext_new.pkl'
+inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_blend_dext_new.pkl'
 df = pd.read_pickle(inputfile)
 print (len(df))
 mgas = df.logmgas
 mstars = df.logmstar
 mbary = 10**mgas + 10**mstars
 #inobssample = ((df.grpcz >= 3000.) & (df.grpcz <= 7000.)) & ((df.absrmag < -17.3) & (np.log10(mbary) > 9.2))
-inobssample = ((df.grpcz >= 3000.) & (df.grpcz <= 7000.)) & ((df.absrmag < -17.3) | (np.log10(mbary) > 9.2))
+inobssample = ((df.grpcz >= 4500.) & (df.grpcz <= 7000.) & (np.log10(mbary) > 9.2))
 #inobssample = ((df.grpcz >= 3000.) & (df.grpcz <= 7000.)) & ((np.log10(mbary) > 9.2))
-
 
 plt.figure()
 plt.plot(df.absrmag, np.log10(mbary),'b.')
+total = np.sum(np.log10(mbary) > 9.0)
 df = df[inobssample]
 mgas = df.logmgas
 mstars = df.logmstar
-mbary = np.log10(10**mgas + 10**mstars)
-plt.plot(df.absrmag, mbary,'r.')
+mbary = 10**mgas + 10**mstars
+sel = float(np.sum(np.log10(mbary) > 9.0))
+print sel/total
+plt.plot(df.absrmag, np.log10(mbary),'r.')
 plt.plot(-17.3+0*np.linspace(8,12), np.linspace(8,12),'k')
 plt.plot(np.linspace(-24,-16),9.2+0*np.linspace(-24,-16),'k')
 plt.xlim(-16,-24)
