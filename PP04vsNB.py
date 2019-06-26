@@ -16,8 +16,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-#rdat = pd.read_pickle("C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_bpt1filter_new.pkl")
-rdat = pd.read_pickle("C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO+RESOLVE_filter_new.pkl")
+rdat = pd.read_pickle("C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_bpt1filter_new.pkl")
+#rdat = pd.read_pickle("C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO+RESOLVE_filter_new.pkl")
 # a simple Te method calib. is the NII/Halpha PP04, for ???2.5 < N2 < ???0.3
 # Pettini & Pagel 2004
 
@@ -55,17 +55,17 @@ PP04_12logOH_v2[selbd] = (-99.)
 
 
 
-iziout = np.genfromtxt("C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE+ECO_bpassagn_full_nicholls_fstar.txt", dtype = None, names = ["name", 
+iziout = np.genfromtxt("C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_bpass_csf_nicholls.txt", dtype = None, names = ["name", 
                                                                                         "Estimate", "err_up", "err_down"])
 #iziout = np.genfromtxt("C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_bpass_bpt1filter_SEL_grovesdep.txt", dtype = None, names = ["name", 
 #                                                                                         "Estimate", "err_up", "err_down"])
 #iziout = np.genfromtxt("C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_nicholls_bpt1filter_SEL_new.txt", dtype = None, names = ["name", 
 #                                                                                        "Estimate", "err_up", "err_down"])
 #iziout['Estimate']+=8.76
-#iziout2 = np.genfromtxt("C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_bpass_bpt1filter_nicholls+jenkins.txt", dtype = None, names = ["name", 
-#                                                                                                                                 "Estimate", "err_up", "err_down"])
-iziout2 = np.genfromtxt("C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE+ECO_bpass_full_nicholls.txt", dtype = None, names = ["name", 
+iziout2 = np.genfromtxt("C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_bpass_bpt1filter_nicholls+jenkins.txt", dtype = None, names = ["name", 
                                                                                                                                  "Estimate", "err_up", "err_down"])
+#iziout2 = np.genfromtxt("C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE+ECO_bpass_sf_nichollsjen_csf.txt", dtype = None, names = ["name", 
+#                                                                                                                                 "Estimate", "err_up", "err_down"])
 bpt = pd.read_csv('eco+resolve_emlineclass_filter.csv')
 iziout2['Estimate']+=8.76
 iziout['Estimate']+=8.76
@@ -123,8 +123,8 @@ N2 = 1.754*xticks - 15.614
 N2_label = ["%.2f" % z for z in N2]
 ax2.set_xticklabels(N2_label)
 ax1.plot(PP04_12logOH, iziout["Estimate"], 'bo', markersize = 5, alpha = 0.2)
-ax1.plot(PP04_12logOH[list(bpt['sftoagn'])], iziout["Estimate"][bpt['sftoagn']], 
-         'rs', markersize = 5)
+#ax1.plot(PP04_12logOH[list(bpt['sftoagn'])], iziout["Estimate"][bpt['sftoagn']], 
+#         'rs', markersize = 5)
 ax1.set_xlim(7.4,9.2)
 ax1.set_ylim(7.4,9.2)
 ax1.plot(x_solar, y_solar_40,'k-.', linewidth = 1)
@@ -144,8 +144,8 @@ ax1.text(y_solar_40[0]-0.05, 8.9, r'[NII]/H$\alpha$ = ' + "%0.2f" % N2_40,
          fontsize=14, color='k', rotation = 'vertical')
 ax1.plot(np.arange(7,11),np.arange(7,11), "r")
 #ax1.set_title("NB(BPASS+Nicholls with limited q) vs PP04", y = 1.1)
-ax1.set_ylabel("12 + log(O/H)  (using Nicholls with F* = 0.3)", size = 15)
-ax1.set_xlabel(r"12 + log(O/H)  (using [NII]/H$\alpha$)", size = 15)
+ax1.set_ylabel("12 + log(O/H)  (using grid w/ all AGN Fraction)", size = 14)
+ax1.set_xlabel(r"12 + log(O/H)  (using [NII]/H$\alpha$)", size = 14)
 ax2.set_xlabel(r"[NII]/H$\alpha$", size = 15)
 #ax1.plot(np.arange(-1.3,0.5),np.arange(-1.3,0.5), "r")
 ax2.set_xticklabels(N2_label)
@@ -157,8 +157,8 @@ ax2 = ax1.twiny()
 #ax2.set_xticks([0.0,0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,1.0])
 ax2.set_xticks(np.linspace(0,1,10))
 ax1.plot(PP04_12logOH, iziout2["Estimate"], 'bo', markersize = 5, alpha = 0.2)
-ax1.plot(PP04_12logOH[list(bpt['sftoagn'])], iziout2["Estimate"][bpt['sftoagn']], 
-         'rs', markersize = 5)
+#ax1.plot(PP04_12logOH[list(bpt['sftoagn'])], iziout2["Estimate"][bpt['sftoagn']], 
+#         'rs', markersize = 5)
 ax1.set_xlim(7.4,9.2)
 ax1.set_ylim(7.4,9.2)
 #ax1.set_title("NB(BPASS+Nicholls with all q) vs PP04", y=1.1)
@@ -182,7 +182,7 @@ ax1.text(y_solar_30[0]-0.05, 8.9, r'[NII]/H$\alpha$ = ' + "%0.2f" % N2_30,
 ax1.text(y_solar_40[0]-0.05, 8.9, r'[NII]/H$\alpha$ = ' + "%0.2f" % N2_40,
          fontsize=14, color='k', rotation = 'vertical')
 #ax1.set_title("NB(Levesque10) vs PP04", y=1.1)
-ax1.set_ylabel("12 + log(O/H)  (using Nicholls+Jenkins14 )", size = 15)
+ax1.set_ylabel("12 + log(O/H)  (using grid w/ only SF)", size = 15)
 #ax1.set_ylabel("12 + log(O/H)  (using grid with Hydrogen Density)", size = 15)
 ax1.set_xlabel(r"12 + log(O/H)  (using [NII]/H$\alpha$)", size = 15)
 ax2.set_xlabel(r"[NII]/H$\alpha$", size = 15)

@@ -6,7 +6,7 @@ Created on Thu May 23 10:52:56 2019
 """
 
 import pandas as pd
-import matplotlib.pyplot as ax2
+import matplotlib.pyplot as plt
 import os
 import numpy as np
 
@@ -27,13 +27,13 @@ inobssample = (eco_mbary > 9.2)
 eco = df[inobssample]
 eco_mbary = np.log10(10**eco.logmgas + 10**eco.logmstar)
 
-#ax2.figure()
-#ax2.plot(df.absrmag, full_mbary, 'b.')
-#ax2.plot(eco.absrmag, eco_mbary, 'ko', mfc ='none')
-#yaxis = np.linspace(-24,-17)
-#ax2.plot(yaxis, 9.2*np.ones(len(yaxis)), 'r-.')
-#ax2.xlim(-17,-24)
-#ax2.ylim(8,12)
+plt.figure()
+plt.plot(df.absrmag, full_mbary, 'b.')
+plt.plot(eco.absrmag, eco_mbary, 'ko', mfc ='none')
+yaxis = np.linspace(-24,-17)
+plt.plot(yaxis, 9.2*np.ones(len(yaxis)), 'r-.')
+plt.xlim(-17,-24)
+plt.ylim(8,12)
 #n_eco = float(len(eco))
 #n_full = len(full_mbary)
 #

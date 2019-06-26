@@ -101,18 +101,18 @@ ax2.set_xlim(7.75,16)
 legend = ax2.legend([], [], title = 'ECO', loc = 2)
 legend.get_title().set_fontsize('14')
 
-
-N2 = np.log10(resolve.nii_6584_flux/resolve.h_alpha_flux)
+#resolve = pd.read_csv('ECO+RESOLVE_filter_new.csv')
+#N2 = np.log10(resolve.nii_6584_flux/resolve.h_alpha_flux)
 #selgd<-which(N2>(-2.5) & N2<(-0.3))
-selbd = ((N2<-2.5) | (N2>-0.3))
-resolve_Z = 9.37+2.03*N2+1.26*N2**2+0.32*N2**3
-#zdata = np.genfromtxt('RESOLVE+ECO_bpassagn_full_nicholls_fstar.txt', 
-#        dtype = None, names = ["name", "Estimate", "err_up", "err_down"]) 
-#resolve_Z = zdata["Estimate"]+8.76
-rep = np.isnan(resolve_Z)
-resolve_Z[rep] = (-99.)
-resolve_Z[selbd] = (-99.)
-resolve_bpt = pd.read_csv('resolve_emlineclass_filter_new.csv')
+#selbd = ((N2<-2.5) | (N2>-0.3))
+#resolve_Z = 9.37+2.03*N2+1.26*N2**2+0.32*N2**3
+zdata = np.genfromtxt('RESOLVE+ECO_bpassagn_nichollsjen_ssp20.txt', 
+        dtype = None, names = ["name", "Estimate", "err_up", "err_down"]) 
+resolve_Z = zdata["Estimate"]+8.76
+#rep = np.isnan(resolve_Z)
+#resolve_Z[rep] = (-99.)
+#resolve_Z[selbd] = (-99.)
+resolve_bpt = pd.read_csv('eco+resolve_emlineclass_filter.csv')
 resolve_sfagn_Z = resolve_Z[list(resolve_bpt['sftoagn'])]
 resolve_defagn_Z = resolve_Z[list(resolve_bpt['defagn'])]
 
@@ -140,7 +140,7 @@ hist_sfagn = ax1.hist(resolve_sfagn_Z, bins = 'fd', histtype = 'step',
 #            hatch = '\/', ec = 'blue', lw = 3, density = True, 
 #            label = 'SF-to-AGN Galaxies')
 ax1.set_ylabel('Number of Galaxies', size = 15)
-ax1.set_xlabel(r'Metallicity (in $\rm 12 + \log (O/H)$ units)', size = 15)
+ax1.set_xlabel(r'Metallicity ($\rm 12 + \log (O/H)$ using BPASS model)', size = 15)
 
 histmax = max(max(hist_full[0]), max(hist_sfagn[0]))
 x_solar = np.linspace(0, 1.5*histmax)
@@ -161,7 +161,7 @@ ax1.text(y_solar_40[0]-0.05, 1.2*histmax, r'0.4 $Z_{\odot}$',
          fontsize=14, color='k', rotation = 'vertical')
 ax1.text(y_solar[0]-0.05, 1.2*histmax, r'1.0 $Z_{\odot}$',
          fontsize=14, color='k', rotation = 'vertical')
-legend = ax1.legend(title = 'RESOLVE', loc = 2)
+legend = ax1.legend(title = 'RESOLVE + ECO', loc = 2)
 legend.get_title().set_fontsize('14')
 ax1.set_ylim(0,max(x_solar))
 

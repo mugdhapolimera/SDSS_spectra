@@ -17,12 +17,12 @@ import extinction
 import os
 #pylab.ion()
 
-flag = 'smc'
-#``flag = 'mw'
-#os.chdir('C:\Users\mugdhapolimera\github\SDSS_Spectra')
+#flag = 'smc'
+flag = 'mw'
+os.chdir(r'C:\Users\mugdhapolimera\github\xray')
 #os.chdir('./github/SDSS_Spectra')
 #open the file
-data = pd.read_pickle('ECO_full_raw.pkl')
+data = pd.read_csv('xmmagn_flux.csv')
 wavelengths = {'oii_3726_flux' : 3726, 'oii_3729_flux' : 3729, 
                'neiii_3869_flux' : 3869, 'h_delta_flux' : 4101, 
                'h_gamma_flux' : 4340, 'oiii_4363_flux' : 4363, 
@@ -46,10 +46,10 @@ wavelengths = {'oii_3726_flux' : 3726, 'oii_3729_flux' : 3729,
 '''
 if flag =='mw':
     extinction_func = extinction.mwextinction
-    outputfile = 'ECO_full_mwdext_new.pkl'
+    outputfile = 'XMM_AGN_mwdext.pkl'#'ECO_full_mwdext_new.pkl'
 if flag =='smc':
     extinction_func = extinction.smcextinction
-    outputfile = 'ECO_full_smcdext_new.pkl'
+    outputfile = 'XMM_AGN_smcdext.pkl' #'ECO_full_smcdext_new.pkl'
 Alambda_Ebv= {}    
 for line in wavelengths.keys():               
     Alambda_Ebv[line] = extinction_func(1/(wavelengths[line]*10**-4))
