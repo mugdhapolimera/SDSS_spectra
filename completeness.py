@@ -12,7 +12,7 @@ import numpy as np
 
 os.chdir('C:/Users/mugdhapolimera/github/SDSS_Spectra/')
 
-df = pd.read_pickle('ECO_full_blend_dext_new.pkl')
+df = pd.read_pickle('RESOLVE_full_blend_dext_new.pkl')
 print len(df)
 inobssample = (((df.grpcz >= 3000.) & (df.grpcz <= 7000.)))
 df = df[inobssample]
@@ -47,6 +47,7 @@ dec=df.dedeg
 grpcz = df.grpcz
 cz = df.cz
 infall = (ra > 22*15.) | (ra < 3*15.)
+inspring = (ra > 8.75*15.) & (ra < 15.75*15.)
 inobssample = ((grpcz >= 4500.) & (grpcz <= 7000.) & infall) 
 df = df[inobssample]
 
@@ -55,9 +56,9 @@ mgas = df.logmgas
 mstars = df.logmstar
 mbary = 10**mgas + 10**mstars
 resfullmbary = np.log10(mbary)
-inobssample = (resfullmbary > 9.2)
-#inobssample = (((flinsample | (np.log10(mbary) > 9.0)) & infall) | 
-#        ((flinsample | (np.log10(mbary) > 9.2)) & inspring))
+#inobssample = (resfullmbary > 9.2)
+inobssample = (((flinsample | (np.log10(mbary) > 9.0)) & infall))
+# | ((flinsample | (np.log10(mbary) > 9.2)) & inspring))
 resolve = df[inobssample]
 mgas = resolve.logmgas
 mstars = resolve.logmstar
@@ -69,24 +70,24 @@ ax1 = fig.add_subplot(121)
 ax1.plot(df.absrmag, resfullmbary, '.', color = 'gray', alpha = 0.3, 
          label = 'Parent Sample')
 ax1.plot(resolve.absrmag, resmbary, 'k.', 
-         label = 'Mass Limited Sample')
+         label = 'Mass+Luminosity Limited Sample')
 yaxis = np.linspace(-24,-15)
-ax1.plot(yaxis, 9.2*np.ones(len(yaxis)), 'b-.', 
-         label = 'Luminosity limit for ECO')
+ax1.plot(yaxis, 9.0*np.ones(len(yaxis)), 'b-.', 
+         label = 'Mass Limit for RESOLVE-B')
 yaxis = np.linspace(8,12)
-ax1.plot(-17.33*np.ones(len(yaxis)), yaxis, 'r-.', 
-         label = 'Mass limit for RESOLVE and ECO')
+ax1.plot(-17.0*np.ones(len(yaxis)), yaxis, 'r-.', 
+         label = 'Luminosity limit for RESOLVE-B ')
 ax1.set_xlim(-15,-24)
 ax1.set_ylim(8,12)
 ax1.set_xlabel(r'$\rm M_r$', fontsize = 14)
 ax1.set_ylabel(r'$\rm M_{baryonic}$', fontsize = 14)
 ax1.legend(fontsize = 14, loc = 2)
 ax1.text(-22, 8.25, 'RESOLVE - B', fontsize = 14, color = 'k')
-lowlum = np.sum((resolve.absrmag > -17.33) & (resmbary > 9.2))
-resabovem = float(np.sum((resmbary > 9.2)))
+lowlum = np.sum((resolve.absrmag > -17.0) & (resmbary > 9.0))
+resabovem = float(np.sum((resmbary > 9.0)))
 print lowlum, resabovem, lowlum/resabovem
 
-inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_filter_new.pkl'
+inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_snr5.pkl'
 df = pd.read_pickle(inputfile)
 print len(df)
 mgas = df.logmgas
@@ -96,7 +97,7 @@ finalmbary = np.log10(mbary)
 resolvefinal = df
 ax2 = fig.add_subplot(122)
 ax2.plot(resolve.absrmag, resmbary, '.', color = 'k',  
-         label = 'Mass Limited Sample')
+         label = 'Mass+Luminosity Limited Sample')
 ax2.plot(resolvefinal.absrmag, finalmbary, 'o', color = 'r',
          mfc ='none', label = 'Final Sample')
 #yaxis = np.linspace(-24,-15)
@@ -106,11 +107,11 @@ ax2.plot(resolvefinal.absrmag, finalmbary, 'o', color = 'r',
 #ax2.plot(-17.33*np.ones(len(yaxis)), yaxis, 'r-.', 
 #         label = 'Mass limit for RESOLVE and ECO')
 ax2.set_xlim(-15,-24)
-ax2.set_ylim(9,12)
+ax2.set_ylim(8.5,12)
 ax2.set_xlabel(r'$\rm M_r$', fontsize = 14)
 ax2.set_ylabel(r'$\rm M_{baryonic}$', fontsize = 14)
 ax2.legend(fontsize = 14, loc = 2)
-ax2.text(-22, 9.25, 'RESOLVE - B', fontsize = 14, color = 'k')
+ax2.text(-22, 8.75, 'RESOLVE - B', fontsize = 14, color = 'k')
 lowlum = np.sum((resolve.absrmag > -17.33) & (resmbary > 9.2))
 resabovem = float(np.sum((resmbary > 9.2)))
 print lowlum, resabovem, lowlum/resabovem

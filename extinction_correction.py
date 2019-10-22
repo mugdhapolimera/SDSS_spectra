@@ -13,16 +13,18 @@ Created on Sun Dec 02 18:13:57 2018
 import numpy as np
 import pandas as pd
 import extinction
-
 import os
 #pylab.ion()
 
 #flag = 'smc'
 flag = 'mw'
-os.chdir(r'C:\Users\mugdhapolimera\github\xray')
-#os.chdir('./github/SDSS_Spectra')
+#os.chdir(r'C:\Users\mugdhapolimera\github\xray')
+#os.chdir('../github/SDSS_Spectra')
+#os.chdir(r'C:\Users\mugdhapolimera\Desktop\UNC\Courses\Research\SAMI Data\71146')
 #open the file
-data = pd.read_csv('xmmagn_flux.csv')
+#data = pd.read_csv('xmmagn_flux.csv')
+#data = pd.read_csv('71146.csv')
+data = pd.read_csv('NSA_RESOLVE.csv')
 wavelengths = {'oii_3726_flux' : 3726, 'oii_3729_flux' : 3729, 
                'neiii_3869_flux' : 3869, 'h_delta_flux' : 4101, 
                'h_gamma_flux' : 4340, 'oiii_4363_flux' : 4363, 
@@ -46,10 +48,10 @@ wavelengths = {'oii_3726_flux' : 3726, 'oii_3729_flux' : 3729,
 '''
 if flag =='mw':
     extinction_func = extinction.mwextinction
-    outputfile = 'XMM_AGN_mwdext.pkl'#'ECO_full_mwdext_new.pkl'
+    outputfile = 'NSA_RESOLVE_mwdext.csv' #XMM_AGN_mwdext.csv'#'ECO_full_mwdext_new.pkl'
 if flag =='smc':
     extinction_func = extinction.smcextinction
-    outputfile = 'XMM_AGN_smcdext.pkl' #'ECO_full_smcdext_new.pkl'
+    outputfile = 'NSA_RESOLVE_smcdext.csv'#'XMM_AGN_smcdext.csv' #'ECO_full_smcdext_new.pkl'
 Alambda_Ebv= {}    
 for line in wavelengths.keys():               
     Alambda_Ebv[line] = extinction_func(1/(wavelengths[line]*10**-4))
@@ -94,18 +96,18 @@ for galname in data.index.values:
                             for line in wavelengths.keys()}
             #output is dextincted avg flux for each line in each galaxy
     for line in wavelengths.keys():
-         
-         data_dext[line].loc[galname] = (data[line].loc[galname]*
-                                     10.0**(Alambda_gal[line]/2.5))
-         X = 10**(Alambda_gal[line]/2.5)
-         X_err = 2.303 * X * Alambda_gal_err[line]
-#         if line[0] == 'F':
-#             line_err = data[line+'_Err'].loc[galname]/data[line].loc[galname]
-#             data_dext[line+'_Err'].loc[galname] = data_dext[line].loc[galname]*(line_err**2 + (X_err/X)**2)**0.5
- #        else:
-         line_err = data[line+'_err'].loc[galname]/data[line].loc[galname]
-         data_dext[line+'_err'].loc[galname] = data_dext[line].loc[galname]*(line_err**2 + (X_err/X)**2)**0.5
+         if line in data.keys():
+             data_dext[line].loc[galname] = (data[line].loc[galname]*
+                                         10.0**(Alambda_gal[line]/2.5))
+             X = 10**(Alambda_gal[line]/2.5)
+             X_err = 2.303 * X * Alambda_gal_err[line]
+    #         if line[0] == 'F':
+    #             line_err = data[line+'_Err'].loc[galname]/data[line].loc[galname]
+    #             data_dext[line+'_Err'].loc[galname] = data_dext[line].loc[galname]*(line_err**2 + (X_err/X)**2)**0.5
+     #        else:
+             line_err = data[line+'_err'].loc[galname]/data[line].loc[galname]
+             data_dext[line+'_err'].loc[galname] = data_dext[line].loc[galname]*(line_err**2 + (X_err/X)**2)**0.5
                                  
 #print data_dext.loc[galname]         
-data_dext.to_pickle(outputfile)
+#data_dext.to_csv(outputfile)
 #####################################################################
