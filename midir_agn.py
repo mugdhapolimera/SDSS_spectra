@@ -48,6 +48,8 @@ bad = baderr | badphot
 #catalog = catalog[~bad]
 w12 = catalog['mw1'][~bad] - catalog['mw2'][~bad]
 w23 = catalog['mw2'][~bad] - catalog['mw3'][~bad]
+w12_err = np.sqrt(catalog['emw1'][~bad]**2 + catalog['emw2'][~bad]**2)
+w23_err = np.sqrt(catalog['emw2'][~bad]**2 + catalog['emw3'][~bad]**2)
 resname = catalog2['name'][~bad]
 plt.figure()
 plt.plot(w23,w12,'o')
@@ -64,25 +66,30 @@ plt.plot(jarretx(yaxis)[0], yaxis, 'k', jarretx(yaxis)[1], yaxis, 'k')
 plt.plot(xaxis, jarrety(xaxis)[0], 'k', xaxis, jarrety(xaxis)[1],'k')
 plt.xlabel('W2 - W3')
 plt.ylabel('W1 - W2')
-midiragn = ((w12 >= 0.8) | ((w23 > 2.2) & (w23 < 4.2) & (w12 < 1.7) & 
-                            (0.1*w23 + 0.38 < w12)) | 
-           (w12 >= 0.52) & (w12 >= (5.78*w23) -24.50))
+#midiragn = ((w12 >= 0.8) | ((w23 > 2.2) & (w23 < 4.2) & (w12 < 1.7) & 
+#                            (0.1*w23 + 0.38 < w12)) | 
+#           (w12 >= 0.52) & (w12 >= (5.78*w23) -24.50))
 
+midiragn = ((w12-w12_err >= 0.8) | ((w23 > 2.2) & (w23 < 4.2) & \
+             (w12-w12_err < 1.7) & (0.1*w23 + 0.38 < w12-w12_err)) | \
+           (w12-w12_err >= 0.52) & (w12-w12_err >= (5.78*w23) -24.50))
 
-plt.plot(w23[midiragn],w12[midiragn],'rs')
-plt.ylim(-6.0,10)
+#plt.plot(w23[midiragn],w12[midiragn],'rs')
+plt.errorbar(w23[midiragn],w12[midiragn],fmt = 'rs', xerr = w23_err[midiragn],
+             yerr = w12_err[midiragn])
+#plt.ylim(-6.0,10)
 #To print names of mid-IR AGN
 for i in range(len(catalog2.name[~bad][midiragn])):
     print "'"+catalog2.name[~bad][midiragn][i]+"' ,",
 
 
 #Flags to check SFing-AGN    
-#flags = pd.read_csv('SDSS_spectra/resolve_emlineclass_full_snr5.csv')
-#flags.index = flags.galname
-#    
-#sfagn = list(flags.galname.iloc[np.where(flags.sftoagn)])
-#sfagnndx = [x for x in range(len(resname)) if resname[x] in sfagn]
-#plt.plot(w23[sfagnndx],w12[sfagnndx],'gs')
+flags = pd.read_csv('SDSS_spectra/resolve_emlineclass_full_snr5.csv')
+flags.index = flags.galname
+    
+sfagn = list(flags.galname.iloc[np.where(flags.sftoagn)])
+sfagnndx = [x for x in range(len(resname)) if resname[x] in sfagn]
+plt.plot(w23[sfagnndx],w12[sfagnndx],'gs')
 
-#sfagnmidir = [resname[midiragn][x] for x in range(len(resname[midiragn])) if resname[midiragn][x] in sfagn]
-#print sfagnmidir
+sfagnmidir = [resname[midiragn][x] for x in range(len(resname[midiragn])) if resname[midiragn][x] in sfagn]
+print sfagnmidir
