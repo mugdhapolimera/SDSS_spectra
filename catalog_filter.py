@@ -129,7 +129,7 @@ snr = ((h_alpha > cut*h_alpha_err) & (nii_sum > cut*nii_sum_err) &
 
 print len(df)
 df = df[snr]
-print len(df)
+print len(df) 
 #flags = pd.read_csv('C:/Users/mugdhapolimera/github/BPT/resolve_emlineclass_bpt1_new.csv')
 #flags.index = flags['galname']
 
