@@ -32,19 +32,13 @@ def satyapalx(x):
 
 def satyapaly(x):
     return 5.78*x -24.50
-if sys.platform == 'linux2':
-    os.chdir('/afs/cas.unc.edu/users/m/u/mugpol/github')
-else:
-    os.chdir('C:/Users/mugdhapolimera/github')
-
 ##############################################################################
 #Reading in RESOLVE catalogs and new WISE photometry and setting up the data
 ##############################################################################
-path = os.path.join(os.getcwd(),'SDSS_spectra\/')
+path = os.getcwd()+'\/'
 resolve = pd.read_csv(path+'RESOLVE_full_blend_dext_new.csv')
 resolve.index = resolve.name
 
-path = os.path.join(os.getcwd(),'izi\/')
 #Reading in the RESOLVE internal database files
 catalog = readsav(path+'resolvecatalogphot.dat')
 catalog2 = readsav(path+'resolvecatalog.dat')
@@ -69,9 +63,8 @@ for x in d.keys():
 #Making a pandas dataframe using the dictionary
 df = pd.DataFrame(data = d)
 df.index = df.name
-
+print('Total RESOLVE galaxies: {}'.format(len(df)))
 #Reading in the new WISE photometry values and converting into a pandas DF
-path = os.path.join(os.getcwd(),'SDSS_spectra\/')
 wise = readsav(path+'resolve_wise_102919.dat')
 wisedf = pd.DataFrame.from_records(data = wise['resolve_wise'][0][0])
 wisedf = wisedf.apply(lambda x: x.astype(str(x.dtype).replace('>','')))
@@ -91,10 +84,12 @@ baderr = np.isnan(df.emw1) | np.isnan(df.emw2) | np.isnan(df.emw3) | \
         np.isnan(df.emw4)
 badphot = (df.mw1 == 0.0) & (df.mw2 == 0.0) & (df.mw3 == 0.0) & \
             (df.mw4 == 0.0)
-snr = (df.mw1/df.emw1 > 5) & (df.mw2/df.emw2 > 5) & \
-        (df.mw3/df.emw3 > 5) & (df.mw4/df.emw4 > 5)
-bad = baderr | badphot | ~snr
-df = df[~bad] #Removing bad data from the DF
+threshold = 5
+snr = (df.mw1/df.emw1 > threshold) & (df.mw2/df.emw2 > threshold) & \
+        (df.mw3/df.emw3 > threshold) & (df.mw4/df.emw4 > threshold)
+good = ~baderr & ~badphot & snr
+df = df[good] #Removing bad data from the DF
+print('Galaxies with true mags/errors and S/N > {}: {}'.format(threshold, len(df)))
 
 #Checking UKIDSS and 2MASS k-band magnitudes- 
 #both k-band mags > 0 
@@ -108,6 +103,14 @@ kmag_agree = (df['ukidsskmag']/df['kmag'] > 0.90) & \
 
 kmagflags = good_kmag & kmag_agree
 df = df[kmagflags] #Removing data with bad kmags from DF
+print('Galaxies with reliable k-band mags: {}'.format(len(df)))
+
+#Surface brightness cut
+sb_threshold = 23
+sb = df['mur50'] < sb_threshold
+df = df[sb]
+print('Galaxies with Surface Brightness < {}mags/arcsec^2: {}'\
+      .format(sb_threshold,len(df)))
 
 ##############################################################################
 #AGN classification based on WISE colour magnitudes
@@ -116,14 +119,7 @@ w12 = df['mw1'] - df['mw2']
 w23 = df['mw2'] - df['mw3']
 w12_err = np.sqrt(df['emw1']**2 + df['emw2']**2)
 w23_err = np.sqrt(df['emw2']**2 + df['emw3']**2)
-big_err = (w23_err > 0.5) | (w12_err > 0.5)
-big_err_name = df.name[big_err]
 
-df = df[~big_err]
-w12 = w12
-w23 = w23
-w12_err = w12_err
-w23_err = w23_err
 #mid-IR AGN if data+/-error satisfies the AGN criteria
 #Stern OR Jarrett
 #midiragn = ((w12 >= 0.8) | ((w23 > 2.2) & (w23 < 4.2) & (w12 < 1.7) & 
