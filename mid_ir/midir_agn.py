@@ -8,6 +8,9 @@ Mid-IR AGN Selection using WISE IR colours
 
 as prescribed by Sartori et al. 2015 using the method of Jarrett et al 2015, 
 Stern et al 2012; and the method of Satyapal et al. 2018 
+
+GAMA data from 
+http://www.gama-survey.org/dr3/schema/table.php?id=56
 """
 
 import numpy as np
@@ -16,7 +19,7 @@ pd.set_option('display.max_rows',500)
 import matplotlib.pyplot as plt
 import os
 from scipy.io.idl import readsav
-import sys
+from astropy.io import fits
 #os.chdir('C:\Users\mugdhapolimera\github\SDSS_spectra')
 def stern(x):
     return 0.8*np.ones(len(x))
@@ -54,6 +57,7 @@ d = {'name' : catalog2['name'],
               'emw3' : catalog['emw3'],
               'emw4' : catalog['emw4'],
               'kmag' : catalog['kmag'],
+              'ekmag' : catalog['ekmag'],
               'ukidsskmag' : catalog['ukidsskmag'],
               'ukidsskflag' : catalog['ukidsskflag'],
               'mur50' : catalog['mur50']}
@@ -63,7 +67,6 @@ for x in d.keys():
 #Making a pandas dataframe using the dictionary
 df = pd.DataFrame(data = d)
 df.index = df.name
-print('Total RESOLVE galaxies: {}'.format(len(df)))
 #Reading in the new WISE photometry values and converting into a pandas DF
 wise = readsav(path+'resolve_wise_102919.dat')
 wisedf = pd.DataFrame.from_records(data = wise['resolve_wise'][0][0])
@@ -74,44 +77,67 @@ wisedf.index = wisedf.name
 #Update the original DF with the new photometry
 #SKIP if you want to use the original photometry
 df.update(wisedf)
+gama = pd.read_csv('GAMA_WISE_RESOLVE.csv')
+gama.index = gama.resname
+reliable = (gama['PHOTFLAG_W1'] > 0) & (gama['PHOTFLAG_W2'] > 0) & \
+            (gama['PHOTFLAG_W3'] > 0)
+
+overlap = df.loc[gama.resname]
+gama_snr = ((gama['mw2']/gama['emw2'] > overlap['mw2']/overlap['emw2']) \
+            & (gama['mw1']/gama['emw1'] > overlap['mw1']/overlap['emw1']) \
+            & (gama['mw3']/gama['emw3'] > overlap['mw3']/overlap['emw3']))
+res_zero = (df['mw1']==0.0) | (df['mw2']==0.0) | (df['mw3']==0.0)
+gama_full = gama.copy()
+gama = gama[reliable & res_zero]
+
+zero = list(df.name[df['mw1']==0.0])
+#df.update(gama)
+df_full = df.copy()
+
+print('Total RESOLVE galaxies: {}'.format(len(df)))
 
 ##############################################################################
 #Performing quality control on the data
 ##############################################################################
 
 #Removing nans, 0 and applying S/N > 5 thresholding for the mid-IR mags
-baderr = np.isnan(df.emw1) | np.isnan(df.emw2) | np.isnan(df.emw3) | \
-        np.isnan(df.emw4)
-badphot = (df.mw1 == 0.0) & (df.mw2 == 0.0) & (df.mw3 == 0.0) & \
-            (df.mw4 == 0.0)
+baderr = np.isnan(df.emw1) | np.isnan(df.emw2) | np.isnan(df.emw3) #| \
+        #np.isnan(df.emw4)
+badphot = (df.mw1 == 0.0) & (df.mw2 == 0.0) & (df.mw3 == 0.0) #& \
+            #(df.mw4 == 0.0)
 threshold = 5
 snr = (df.mw1/df.emw1 > threshold) & (df.mw2/df.emw2 > threshold) & \
-        (df.mw3/df.emw3 > threshold) & (df.mw4/df.emw4 > threshold)
+        (df.mw3/df.emw3 > threshold) #& (df.mw4/df.emw4 > threshold)
 good = ~baderr & ~badphot & snr
-df = df[good] #Removing bad data from the DF
-print('Galaxies with true mags/errors and S/N > {}: {}'.format(threshold, len(df)))
+#df = df[good] #Removing bad data from the DF
+print('Galaxies with true mags/errors and S/N > {}: {}'.format(threshold, \
+      np.sum(good)))
 
 #Checking UKIDSS and 2MASS k-band magnitudes- 
-#both k-band mags > 0 
-df.ukidsskflag = [int(x) for x in df.ukidsskflag]
-good_kmag = (~df['ukidsskflag'] & (df['ukidsskmag'] > 0.0)) & (df['kmag'] > 0) 
+#both k-band mags > 0; 2MASS s/n > 5
+#df.ukidsskflag = [int(x) for x in df.ukidsskflag if x != '']
+if 'kmag' in df.keys():
+    good_kmag = ((df['ukidsskflag'] == '   0') & (df['ukidsskmag'] > 0.0)) | \
+            (df['kmag']/df['ekmag'] > 5.0) 
 
 #UKIDSS and 2MASS mags should be within 10 percent of each other 
-#since they have wavelength bands
-kmag_agree = (df['ukidsskmag']/df['kmag'] > 0.90) & \
+#since they have similar wavelength bands
+    kmag_agree = (df['ukidsskmag']/df['kmag'] > 0.90) & \
             (df['ukidsskmag']/df['kmag'] < 1.1)
 
-kmagflags = good_kmag & kmag_agree
-df = df[kmagflags] #Removing data with bad kmags from DF
-print('Galaxies with reliable k-band mags: {}'.format(len(df)))
+    kmagflags = good_kmag #& kmag_agree
+#df = df[kmagflags] #Removing data with bad kmags from DF
+    print('Galaxies with reliable k-band mags: {}'.format(np.sum(kmagflags)))
 
 #Surface brightness cut
-sb_threshold = 23
-sb = df['mur50'] < sb_threshold
-df = df[sb]
-print('Galaxies with Surface Brightness < {}mags/arcsec^2: {}'\
-      .format(sb_threshold,len(df)))
-
+if 'mur50' in df.keys():
+    sb_threshold = 23
+    sb = df['mur50'] < sb_threshold
+#df = df[sb]
+    print('Galaxies with Surface Brightness < {}mags/arcsec^2: {}'\
+          .format(sb_threshold,np.sum(sb)))
+    df = df[good]# & kmagflags]# & sb]
+#df= df[good]
 ##############################################################################
 #AGN classification based on WISE colour magnitudes
 ##############################################################################
@@ -139,7 +165,6 @@ midiragn = ((w12-w12_err >= 0.8) | ((w23 > 2.2) & (w23 < 4.2) & \
 #plt.ylim(-6.0,10)
 
 plt.figure()
-plt.plot(w23,w12,'o', label = 'Galaxies with reliable WISE mags')
 xaxis = np.linspace(min(w23),max(w23))
 #yaxis = np.linspace(min(w12), max(w12))
 yaxis = np.linspace(jarrety(np.array([2.2]))[1],1.7)
@@ -155,22 +180,51 @@ plt.plot(xaxis, jarrety(xaxis)[1],'k--', label = 'Jarrett15')
 plt.xlabel('W2 - W3')
 plt.ylabel('W1 - W2')
 plt.ylim(min(w12)-0.1, max(w12)+0.1)
-
+plt.errorbar(w23,w12,fmt = 'bo', xerr = w23_err,
+             yerr = w12_err, label = 'Galaxies with reliale WISE mags')
 plt.errorbar(w23[midiragn],w12[midiragn],fmt = 'rs', xerr = w23_err[midiragn],
              yerr = w12_err[midiragn], label = 'Mid-IR AGN')
+plt.errorbar(w23['rs0107'],w12['rs0107'],fmt = 'ks', xerr = w23_err['rs0107'],
+             yerr = w12_err['rs0107'], label = 'rs0107')
+
 plt.legend()
 
 midiragnname = df.name[midiragn]
 print(resolve.loc[midiragnname][['radeg','dedeg']])    
+df_midiragn = resolve.loc[midiragnname]
+df_midiragn.to_csv('WISE_Mid_IR-AGN.csv')
+df.to_csv('WISE_good.csv')
 print('{} mid-IR AGN out of {} galaxies having reliable WISE mags : {}%'\
       .format(len(midiragnname), len(df), \
               round(len(midiragnname)*100.0/len(df),2)))
 #Flags to check SFing-AGN    
-#flags = pd.read_csv('SDSS_spectra/resolve_emlineclass_full_snr5.csv')
-#flags.index = flags.galname
+flags = pd.read_csv('../resolve_emlineclass_full_snr5_master.csv')
+flags.index = flags.galname
 #sfagn = list(flags.galname.iloc[np.where(flags.sftoagn)])
-#sfagnndx = [x for x in range(len(resname)) if resname[x] in sfagn]
-#plt.plot(w23[sfagnndx],w12[sfagnndx],'gs', label = 'SFing-AGN')
+sfagn = unique #list(unqsfagn)
+sfagnndx = [x for x in range(len(df.name)) if df.name[x] in sfagn]
+plt.plot(w23[sfagnndx],w12[sfagnndx],'gs', ms = 15, label = 'SFing-AGN')
 
-#sfagnmidir = [resname[midiragn][x] for x in range(len(resname[midiragn])) if resname[midiragn][x] in sfagn]
-#print sfagnmidir
+sfagnmidir = [df.name[midiragn][x] for x in range(len(df.name[midiragn])) \
+              if df.name[midiragn][x] in sfagn]
+print sfagnmidir
+
+df_full['kmag_flag'] = kmagflags
+df_full['sb_flag'] = sb
+df_full['wise_good'] = good
+df_full['radeg'] = resolve['radeg']
+df_full['dedeg'] = resolve['dedeg']
+#df_full.to_csv('resolve_irphot_new.csv')
+
+#from astropy.table import Table as table
+#gama = table.read('WISECat.fits')
+#mags = ['mw1','mw2','mw3']
+#for x in mags:
+#    plt.figure()
+#    plt.errorbar(gama[x],df_full.loc[gama.resname][x],fmt='o',
+#                 xerr = gama['e'+x],yerr = df_full.loc[gama.resname]['e'+x])
+#    plt.xlabel('GAMA '+x)
+#    plt.ylabel('RESOLVE '+x)
+#    plt.xlim(min(gama[x]),max(gama[x]))
+#    plt.ylim(min(df_full.loc[gama.resname][x]),max(df_full.loc[gama.resname][x]))
+

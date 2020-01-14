@@ -26,8 +26,8 @@ import pandas as pd
 
 eco = 0
 resolve = 1
-portsmouth = 0
-jhu = 1
+portsmouth = 1
+jhu = 0
 if eco: 
     inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO_full_blend_dext_new.pkl'
     outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO_full_snr5_port"
@@ -42,8 +42,8 @@ if eco:
 
 #In RESOLVE Sample filtering
 if resolve:
-    inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_raw.pkl'
-    outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_snr5"
+    inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_blend_dext_new.pkl'
+    outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_snr5_port"
     df = pd.read_pickle(inputfile)
     print len(df)
     ra=df.radeg
@@ -122,7 +122,7 @@ gooddata = ((h_alpha > floor) & (nii_sum > floor) & (oiii > floor) & (oi > floor
             ~np.isnan(oi) & ~np.isnan(sii_sum) & ~np.isnan(h_beta))
 
 df = df[gooddata]
-cut = 3
+cut = 5
 snr = ((h_alpha > cut*h_alpha_err) & (nii_sum > cut*nii_sum_err) & 
        (oiii > cut*oiii_err) & (oi > cut*oi_err) & (sii_sum > cut*sii_sum_err) 
        & (h_beta > cut*h_beta_err))

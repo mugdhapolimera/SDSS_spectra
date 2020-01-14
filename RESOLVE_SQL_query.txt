@@ -14,4 +14,32 @@ FROM #upload u
       JOIN SpecObjAll s ON s.specObjID = x.specObjID
       JOIN GalSpecLine g ON s.specobjid = g.specobjid
       JOIN emissionLinesPort e ON s.specobjid = e.specobjid
+
+SELECT g.oii_3726_flux, g.oii_3726_flux_err, g.oii_3729_flux, 
+g.oii_3729_flux_err, g.neiii_3869_flux, g.neiii_3869_flux_err, 
+g.h_delta_flux, g.h_delta_flux_err, g.h_gamma_flux, g.h_gamma_flux_err, 
+g.oiii_4363_flux, g.oiii_4363_flux_err, g.h_beta_flux,g.h_beta_flux_err,
+ g.oiii_4959_flux, g.oiii_4959_flux_err, g.oiii_5007_flux,
+ g.oiii_5007_flux_err,g.hei_5876_flux, g.hei_5876_flux_err, 
+ g.oi_6300_flux, g.oi_6300_flux_err, g.nii_6548_flux, g.nii_6548_flux_err, 
+ g.h_alpha_flux, g.h_alpha_flux_err,g.nii_6584_flux, g.nii_6584_flux_err, 
+ g.sii_6717_flux, g.sii_6717_flux_err, g.sii_6731_flux, g.sii_6731_flux_err, 
+ g.ariii7135_flux, g.ariii7135_flux_err, g.oii_flux, g.oii_flux_err, 
+ g.oiii_flux, g.oiii_flux_err, g.oii_3726_cont, g.oii_3726_cont_err, g.oii_3729_cont, 
+g.oii_3729_cont_err, g.neiii_3869_cont, g.neiii_3869_cont_err, 
+g.h_delta_cont, g.h_delta_cont_err, g.h_gamma_cont, g.h_gamma_cont_err, 
+g.oiii_4363_cont, g.oiii_4363_cont_err, g.h_beta_cont,g.h_beta_cont_err,
+ g.oiii_4959_cont, g.oiii_4959_cont_err, g.oiii_5007_cont,
+ g.oiii_5007_cont_err,g.hei_5876_cont, g.hei_5876_cont_err, 
+ g.oi_6300_cont, g.oi_6300_cont_err, g.nii_6548_cont, g.nii_6548_cont_err, 
+ g.h_alpha_cont, g.h_alpha_cont_err,g.nii_6584_cont, g.nii_6584_cont_err, 
+ g.sii_6717_cont, g.sii_6717_cont_err, g.sii_6731_cont, g.sii_6731_cont_err, 
+ g.ariii7135_cont, g.ariii7135_cont_err, g.oii_cont, g.oii_cont_err, 
+ g.oiii_cont, g.oiii_cont_err 
+FROM #upload u
+      JOIN #x x ON x.up_id = u.up_id
+      JOIN SpecObjAll s ON s.specObjID = x.specObjID
+      JOIN GalSpecLine g ON s.specobjid = g.specobjid
+      JOIN emissionLinesPort e ON s.specobjid = e.specobjid
+
     
