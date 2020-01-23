@@ -16,7 +16,6 @@ import numpy as np
 
 os.chdir('C:\Users\mugdhapolimera\github\SDSS_spectra/')
 resolve = pd.read_csv('RESOLVE_full_raw.csv', index_col = 'name')
-
 jhuflag = pd.read_csv('resolve_emlineclass_full_snr5_jhu.csv', index_col = 'galname')
 portflag = pd.read_csv('resolve_emlineclass_full_snr5_port.csv', index_col = 'galname')
 nsaflag = pd.read_csv('resolve_emlineclass_full_snr5_nsa.csv', index_col = 'galname')
@@ -24,7 +23,6 @@ nsaflag = pd.read_csv('resolve_emlineclass_full_snr5_nsa.csv', index_col = 'galn
 port = pd.read_csv('RESOLVE_full_snr5_port.csv', index_col = 'name')#[portflag.sftoagn]
 jhu = pd.read_csv('RESOLVE_full_snr5.csv', index_col = 'name')#[jhuflag.sftoagn]
 nsa = pd.read_csv('NSA_RESOLVE.csv', index_col = 'resname')#.loc[nsaflag.index.values[nsaflag.sftoagn]]
- 
 
 allunq = np.unique(list(jhuflag.index) + list(nsaflag.index) + list(portflag.index))   
 #sftoagn = df[ambigsel1 & dwarf][['radeg','dedeg']]
@@ -72,6 +70,9 @@ nsaagnflag = nsaflag.sftoagn | nsaflag.composite | nsaflag.defagn
 portagnflag = portflag.sftoagn | portflag.composite | portflag.defagn
 nsaagn = nsaflag.index.values[nsaagnflag]
 portagn = portflag.index.values[portagnflag]
+nsasf = nsaflag.index.values[nsaflag.defstarform]
+portsf = portflag.index.values[portflag.defstarform]
+jhusf = jhuflag.index.values[jhuflag.defstarform]
 
 for gal in allunq:
     flag = True
@@ -97,4 +98,56 @@ for gal in allunq:
             df.loc[gal,'nii_6548_flux'] = 0.000001
             df.loc[gal,'nii_6548_flux_err'] = 0.000001
 #df.to_csv('RESOLVE_snr5_master.csv')
+
 master = df
+num = len(resolve)
+conf = pd.DataFrame({'name': resolve.index.values, 'nsa': np.zeros(num),
+                           'jhu': np.zeros(num), 'port': np.zeros(num), 
+                           'confidence_level': np.zeros(num)})
+conf.index = conf.name
+conf['nsa'].loc[nsaagn] = 1
+conf['nsa'].loc[nsasf] = -1
+
+conf['port'].loc[portagn] = 1
+conf['port'].loc[portsf] = -1
+
+conf['jhu'].loc[jhuagn.index.values[jhuagn]] = 1
+conf['jhu'].loc[jhusf] = -1
+
+conf['confidence_level'] = conf['nsa'] + conf['port'] + conf['jhu']
+
+final_sample = master.index.values
+
+finalconf = conf.loc[final_sample]
+
+#print(len(np.where(finalconf.confidence_level == 1.0)[0]), 
+#      len(np.where(finalconf.confidence_level == 2.0)[0]), 
+#      len(np.where(finalconf.confidence_level == 3.0)[0]))
+
+dwarf = master.logmstar < 9.5
+agn = np.unique(list(jhuagn.index.values[jhuagn]) + list(nsaagn) + 
+                list(portagn))
+dwarfagn = master.logmstar.loc[agn] < 9.5
+finaldwarf = finalconf.loc[dwarfagn.index.values[dwarfagn]]
+print("Confidence Levels for Dwarf AGN found in Master Catalog from "+
+      "NSA, JHU, Portsmouth Catalogs")
+conf_1 = np.where(finaldwarf.confidence_level == -1.0)[0]
+conf0 = np.where(finaldwarf.confidence_level == 0.0)[0]
+conf1 = np.where(finaldwarf.confidence_level == 1.0)[0]
+conf2 = np.where(finaldwarf.confidence_level == 2.0)[0]
+conf3 = np.where(finaldwarf.confidence_level == 3.0)[0]
+print("Confidence Level -1 : {}".format(len(conf_1)), 
+      "Confidence Level 0 : {}".format(len(conf0)), 
+      "Confidence Level 1 : {}".format(len(conf1)), 
+      'Confidence Level 2 : {}'.format(len(conf2)), 
+      'Confidence Level 3 : {}'.format(len(conf3)))
+
+finalconf.to_csv('Confidence_RESOLVE.csv')
+finalsfagn = finalconf.loc[unique]
+sfagn_targets = list(finalsfagn.iloc[np.where(finalsfagn['confidence_level'] > 0)].name)
+targetlist = master.loc[sfagn_targets][['radeg','dedeg']]
+sami = ['rs0010', 'rs0775']
+targetlist = targetlist.drop(sami)
+
+
+

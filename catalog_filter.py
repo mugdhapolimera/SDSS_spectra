@@ -26,8 +26,8 @@ import pandas as pd
 
 eco = 0
 resolve = 1
-portsmouth = 1
-jhu = 0
+portsmouth = 0
+jhu = 1
 if eco: 
     inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO_full_blend_dext_new.pkl'
     outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO_full_snr5_port"
@@ -59,8 +59,8 @@ if resolve:
     inobssample = ((grpcz >= 4500.) & (grpcz <= 7000.)) & \
     (((flinsample | (np.log10(mbary) > 9.0)) & infall) | \
             ((flinsample | (np.log10(mbary) > 9.2)) & inspring))
-#    inobssample = (((grpcz >= 4500.) & (grpcz <= 7000.)))# & \
-    #(np.log10(mbary) > 9.2))
+#    inobssample = (((grpcz >= 4500.) & (grpcz <= 7000.)) & \
+#    (np.log10(mbary) > 9.2))
 
 
 #for ECO
