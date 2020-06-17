@@ -180,12 +180,15 @@ plt.plot(xaxis, jarrety(xaxis)[1],'k--', label = 'Jarrett15')
 plt.xlabel('W2 - W3')
 plt.ylabel('W1 - W2')
 plt.ylim(min(w12)-0.1, max(w12)+0.1)
-plt.errorbar(w23,w12,fmt = 'bo', xerr = w23_err,
-             yerr = w12_err, label = 'Galaxies with reliale WISE mags')
-plt.errorbar(w23[midiragn],w12[midiragn],fmt = 'rs', xerr = w23_err[midiragn],
-             yerr = w12_err[midiragn], label = 'Mid-IR AGN')
-plt.errorbar(w23['rs0107'],w12['rs0107'],fmt = 'ks', xerr = w23_err['rs0107'],
-             yerr = w12_err['rs0107'], label = 'rs0107')
+#plt.errorbar(w23,w12,fmt = 'bo', xerr = w23_err,
+#             yerr = w12_err, label = 'Galaxies with reliale WISE mags')
+#plt.errorbar(w23[midiragn],w12[midiragn],fmt = 'rs', xerr = w23_err[midiragn],
+#             yerr = w12_err[midiragn], label = 'Mid-IR AGN')
+#plt.errorbar(w23['rs0107'],w12['rs0107'],fmt = 'ks', xerr = w23_err['rs0107'],
+#             yerr = w12_err['rs0107'], label = 'rs0107')
+plt.plot(w23,w12,'bo', label = 'Galaxies with reliale WISE mags')
+plt.plot(w23[midiragn],w12[midiragn],'rs', label = 'Mid-IR AGN')
+#plt.plot(w23['rs0107'],w12['rs0107'],fmt = 'ks', label = 'rs0107')
 
 plt.legend()
 
@@ -200,10 +203,12 @@ print('{} mid-IR AGN out of {} galaxies having reliable WISE mags : {}%'\
 #Flags to check SFing-AGN    
 flags = pd.read_csv('../resolve_emlineclass_full_snr5_master.csv')
 flags.index = flags.galname
-#sfagn = list(flags.galname.iloc[np.where(flags.sftoagn)])
-sfagn = unique #list(unqsfagn)
+sfagn = list(flags.galname.iloc[np.where(flags.sftoagn)])
+#sfagn = unique #list(unqsfagn)
 sfagnndx = [x for x in range(len(df.name)) if df.name[x] in sfagn]
-plt.plot(w23[sfagnndx],w12[sfagnndx],'gs', ms = 15, label = 'SFing-AGN')
+#plt.plot(w23[sfagnndx],w12[sfagnndx],'gs', label = 'SFing-AGN')
+#plt.errorbar(w23[sfagnndx],w12[sfagnndx],fmt = 'gs', xerr = w23_err[sfagnndx],
+#             yerr = w12_err[sfagnndx], label = 'X-ray follow up?')
 
 sfagnmidir = [df.name[midiragn][x] for x in range(len(df.name[midiragn])) \
               if df.name[midiragn][x] in sfagn]

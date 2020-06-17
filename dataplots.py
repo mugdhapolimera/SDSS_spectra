@@ -16,6 +16,7 @@ from astropy.coordinates import SkyCoord
 
 os.chdir('C:/Users/mugdhapolimera/github/SDSS_Spectra/')
 df = pd.read_pickle('RESOLVE_full_blend_dext_new.pkl')
+#df = pd.read_csv('RESOLVE_snr5_master.csv')
 ra=df.radeg
 dec=df.dedeg
 flinsample = df.fl_insample
@@ -26,10 +27,10 @@ inspring = (ra > 8.75*15.) & (ra < 15.75*15.)
 mgas = df.logmgas
 mstars = df.logmstar
 mbary = 10**mgas + 10**mstars
-#    inobssample = ((grpcz >= 4500.) & (grpcz <= 7000.)) & (((flinsample | (np.log10(mbary) > 9.0)) & infall) | ((flinsample | (np.log10(mbary) > 9.2)) & inspring))
-inobssample = (((grpcz >= 4500.) & (grpcz <= 7000.)) & \
-((((np.log10(mbary) > 9.0)) & infall) | \
- (((np.log10(mbary) > 9.2)) & inspring)))
+inobssample = ((grpcz >= 4500.) & (grpcz <= 7000.)) & (((flinsample | (np.log10(mbary) > 9.0)) & infall) | ((flinsample | (np.log10(mbary) > 9.2)) & inspring))
+#inobssample = (((grpcz >= 4500.) & (grpcz <= 7000.)) & \
+#((((np.log10(mbary) > 9.0)) & infall) | \
+# (((np.log10(mbary) > 9.2)) & inspring)))
 resolve_full = df[inobssample]
 
 df = pd.read_pickle('ECO_full_blend_dext_new.pkl')
@@ -41,7 +42,7 @@ inobssample = (((df.grpcz >= 3000.) & (df.grpcz <= 7000.)) & \
 eco_full = df[inobssample]
 
 
-resolve = pd.read_csv('RESOLVE_filter_new.csv')
+resolve = pd.read_csv('RESOLVE_snr5_master.csv')
 eco = pd.read_csv('ECO_filter_new.csv')
 
 resolve_mbary_full = np.log10(10**resolve_full.logmstar +  
@@ -51,24 +52,25 @@ resolve_mbary = np.log10(10**resolve.logmstar +  10**resolve.logmgas)
 eco_mbary = np.log10(10**eco.logmstar +  10**eco.logmgas)
 
 fig = plt.figure('Baryonic Mass Distributions')
-ax1 = fig.add_subplot(121)
-ax1.hist(resolve_mbary_full, bins = 'fd', histtype = 'step', lw = 5)
-ax1.hist(resolve_mbary, bins = 'fd', histtype = 'stepfilled', 
-         hatch = 'x', ec = 'k', lw = 5)
+ax1 = fig.add_subplot(111)
+ax1.hist(resolve_mbary_full, bins = 'fd', ec = 'orange', 
+         histtype = 'step', lw = 5, label = 'Parent RESOLVE Sample \n(1519 galaxies)')
+ax1.hist(resolve_mbary, bins = 'fd', histtype = 'step', 
+         hatch = 'x', ec = 'k', lw = 5 , label = 'Final Sample \n(437 galaxies)')
 ax1.set_ylabel('Number of Galaxies', size = 15)
 ax1.set_xlabel(r'$\rm \log (M_{baryonic})$ $\rm M_{\odot}$', size = 15)
-legend = ax1.legend(title = 'RESOLVE', fontsize = 14)
-legend.get_title().set_fontsize('14')
+legend = ax1.legend(fontsize = 14) #title = 'RESOLVE'
+#legend.get_title().set_fontsize('14')
 
-ax1 = fig.add_subplot(122)
-ax1.hist(eco_mbary_full, bins = 'fd', histtype = 'step', lw = 5, 
-         label = 'Parent Sample')
-ax1.hist(eco_mbary, bins = 'fd', histtype = 'stepfilled', 
-         hatch = 'x', ec = 'k', lw = 5, label = 'Final Sample')
-ax1.set_ylabel('Number of Galaxies', size = 15)
-ax1.set_xlabel(r'$\rm \log (M_{baryonic})$ $\rm M_{\odot}$', size = 15)
-legend = ax1.legend(title = 'ECO', fontsize = 14)
-legend.get_title().set_fontsize('14')
+#ax1 = fig.add_subplot(122)
+#ax1.hist(eco_mbary_full, bins = 'fd', histtype = 'step', lw = 5, 
+#         label = 'Parent Sample')
+#ax1.hist(eco_mbary, bins = 'fd', histtype = 'stepfilled', 
+#         hatch = 'x', ec = 'k', lw = 5, label = 'Final Sample')
+#ax1.set_ylabel('Number of Galaxies', size = 15)
+#ax1.set_xlabel(r'$\rm \log (M_{baryonic})$ $\rm M_{\odot}$', size = 15)
+#legend = ax1.legend(title = 'ECO', fontsize = 14)
+#legend.get_title().set_fontsize('14')
 
 resolve_full_coords = SkyCoord(ra=list(resolve_full.radeg)*u.degree, 
                            dec=list(resolve_full.dedeg)*u.degree, frame='icrs')

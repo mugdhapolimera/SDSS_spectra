@@ -26,25 +26,41 @@ import pandas as pd
 
 eco = 0
 resolve = 1
-portsmouth = 0
-jhu = 1
+portsmouth = 1
+jhu = 0
+nsa = 0
+saveoutput = 1
+hasnr = 1
+bpt1snr = 0
 if eco: 
-    inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO_full_blend_dext_new.pkl'
-    outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO_full_snr5_port"
-    df = pd.read_pickle(inputfile)
+    inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO_full_blend_dext_new.csv'
+    #NSA_ECO_full.csv'#
+    outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO_full_hasnr5_jhu"
+    df = pd.read_csv(inputfile)
+    df.index = df.name
     print (len(df))
     mgas = df.logmgas
     mstars = df.logmstar
     mbary = 10**mgas + 10**mstars
-    inobssample = (((df.grpcz >= 3000.) & (df.grpcz <= 7000.))) #& \
+    ineco = (130.05 < df.radeg) & (df.radeg < 237.45)
+    inobssample = (((df.grpcz >= 3000.) & (df.grpcz <= 7000.)) & 
+                   (np.log10(mbary) > 9.2) & ineco)#\
     #((np.log10(mbary) > 9.2))) #(df.absrmag < -17.3) & 
-
+#(df.absrmag < -17.33)
 
 #In RESOLVE Sample filtering
 if resolve:
-    inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_blend_dext_new.pkl'
-    outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_snr5_port"
-    df = pd.read_pickle(inputfile)
+    inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_blend_dext_new.csv'
+    if portsmouth: 
+        outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_hasnr5_port"
+    if jhu: 
+        outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_hasnr5_jhu"
+    if nsa: 
+        inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/NSA_RESOLVE_full.csv'
+        outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_hasnr3_nsa"
+
+    df = pd.read_csv(inputfile)
+    df.index = df.name
     print len(df)
     ra=df.radeg
     dec=df.dedeg
@@ -56,11 +72,11 @@ if resolve:
     mgas = df.logmgas
     mstars = df.logmstar
     mbary = 10**mgas + 10**mstars
-    inobssample = ((grpcz >= 4500.) & (grpcz <= 7000.)) & \
-    (((flinsample | (np.log10(mbary) > 9.0)) & infall) | \
-            ((flinsample | (np.log10(mbary) > 9.2)) & inspring))
-#    inobssample = (((grpcz >= 4500.) & (grpcz <= 7000.)) & \
-#    (np.log10(mbary) > 9.2))
+#    inobssample = ((grpcz >= 4500.) & (grpcz <= 7000.)) & \
+#    (((flinsample | (np.log10(mbary) > 9.0)) & infall) | \
+#            ((flinsample | (np.log10(mbary) > 9.2)) & inspring))
+    inobssample = (((grpcz >= 4500.) & (grpcz <= 7000.)) & \
+    (np.log10(mbary) > 9.2))
 
 
 #for ECO
@@ -68,6 +84,7 @@ if resolve:
 floor = 10**-3
 ceil = 1e5
 df = df[inobssample]
+#df.to_csv('RESOLVE_inobssample.csv')
 print len(df)
 if portsmouth:
     nii = df['Flux_NII_6583']
@@ -112,7 +129,42 @@ if jhu:
     
         sii_sum_err = df['sii_6731_flux_err']
 
-gooddata = ((h_alpha > floor) & (nii_sum > floor) & (oiii > floor) & (oi > floor) &
+#gooddata = ((h_alpha > floor) & (nii_sum > floor) & (oiii > floor) & (oi > floor) &
+#            (sii_sum > floor) & (h_beta > floor)  & (h_alpha_err > floor) & 
+#            (nii_sum_err > floor) & (oiii_err > floor) & 
+#            (oi_err > floor) & (sii_sum_err > floor) & 
+#            (h_alpha < ceil) & (nii_sum < ceil) & (oiii < ceil) & (oi < ceil) &
+#            (sii_sum < ceil) & (h_beta < ceil) & 
+#            ~np.isnan(h_alpha) & ~np.isnan(nii_sum) & ~np.isnan(oiii) & 
+#            ~np.isnan(oi) & ~np.isnan(sii_sum) & ~np.isnan(h_beta))
+
+#df = df[gooddata]
+cut = 5
+if hasnr:
+    snr = ((h_alpha > cut*h_alpha_err)) 
+    gooddata = ((h_alpha > floor) & (h_alpha_err > floor) & 
+            (h_alpha < ceil)  & 
+            ~np.isnan(h_alpha))
+
+
+elif bpt1snr:
+    snr = ((h_alpha > cut*h_alpha_err) 
+    & (nii_sum > cut*nii_sum_err) & 
+   (oiii > cut*oiii_err) & (h_beta > cut*h_beta_err))
+
+    gooddata = ((h_alpha > floor) & (nii_sum > floor) & (oiii > floor) 
+            & (h_beta > floor)  & (h_alpha_err > floor) & 
+            (nii_sum_err > floor) & (oiii_err > floor) & 
+            (h_alpha < ceil) & (nii_sum < ceil) & (oiii < ceil) & (h_beta < ceil) 
+            & ~np.isnan(h_alpha) & ~np.isnan(nii_sum) & ~np.isnan(oiii) & 
+            ~np.isnan(h_beta))
+
+else:
+    snr = ((h_alpha > cut*h_alpha_err) 
+        & (nii_sum > cut*nii_sum_err) & 
+       (oiii > cut*oiii_err) & (oi > cut*oi_err) & (sii_sum > cut*sii_sum_err) 
+       & (h_beta > cut*h_beta_err))
+    gooddata = ((h_alpha > floor) & (nii_sum > floor) & (oiii > floor) & (oi > floor) &
             (sii_sum > floor) & (h_beta > floor)  & (h_alpha_err > floor) & 
             (nii_sum_err > floor) & (oiii_err > floor) & 
             (oi_err > floor) & (sii_sum_err > floor) & 
@@ -120,13 +172,7 @@ gooddata = ((h_alpha > floor) & (nii_sum > floor) & (oiii > floor) & (oi > floor
             (sii_sum < ceil) & (h_beta < ceil) & 
             ~np.isnan(h_alpha) & ~np.isnan(nii_sum) & ~np.isnan(oiii) & 
             ~np.isnan(oi) & ~np.isnan(sii_sum) & ~np.isnan(h_beta))
-
 df = df[gooddata]
-cut = 5
-snr = ((h_alpha > cut*h_alpha_err) & (nii_sum > cut*nii_sum_err) & 
-       (oiii > cut*oiii_err) & (oi > cut*oi_err) & (sii_sum > cut*sii_sum_err) 
-       & (h_beta > cut*h_beta_err))
-
 print len(df)
 df = df[snr]
 print len(df) 
@@ -134,9 +180,10 @@ print len(df)
 #flags.index = flags['galname']
 
 #df = df[flags['defstarform']]
-#df.to_pickle(outputfile+".pkl")
-#df.to_csv(outputfile+".csv")
-#print len(df)
+if saveoutput:
+    df.to_pickle(outputfile+".pkl")
+    df.to_csv(outputfile+".csv")
+    print len(df)
 
 #old
 #df = df[~np.isnan(df.h_alpha_flux) & (df.h_alpha_flux > floor)

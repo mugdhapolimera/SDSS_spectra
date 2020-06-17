@@ -24,7 +24,9 @@ flag = 'mw'
 #open the file
 #data = pd.read_csv('xmmagn_flux.csv')
 #data = pd.read_csv('71146.csv')
-data = pd.read_csv('NSA_RESOLVE.csv')
+#data = pd.read_csv('NSA_RESOLVE.csv')
+data = pd.read_csv('ECO_full_raw.csv')
+data.index = data.name
 wavelengths = {'oii_3726_flux' : 3726, 'oii_3729_flux' : 3729, 
                'neiii_3869_flux' : 3869, 'h_delta_flux' : 4101, 
                'h_gamma_flux' : 4340, 'oiii_4363_flux' : 4363, 
@@ -81,33 +83,37 @@ mw_A_atmwlam  = np.zeros(len(EBV_excess))
 #if 'flux_ratio_2c' in lines:
 #    lines.pop(np.where('flux_ratio_2c' in lines)[0])
 #print lines
-for galname in data.index.values:
-    print galname
-    #factor to relate each mw lam and color excess    
-    #ext['Al_Ebv']*EBV_excess[i] #for particular galaxy
-    #there is a mw_A_atmwlam for each galaxy, this index is the same for all
-    
-    #if np.isfinite(EBV_excess.loc[galname]): 
-        #Extinction for each line in a galaxy is given by
-        # A_lambda_gal = A_lambda/E(B-V) * E(B-V)_gal
-    Alambda_gal = {line : Alambda_Ebv[line]*EBV_excess.loc[galname] \
-                            for line in wavelengths.keys()}
-    Alambda_gal_err = {line : Alambda_Ebv[line]*EBV_excess_err.loc[galname] \
-                            for line in wavelengths.keys()}
-            #output is dextincted avg flux for each line in each galaxy
-    for line in wavelengths.keys():
-         if line in data.keys():
-             data_dext[line].loc[galname] = (data[line].loc[galname]*
-                                         10.0**(Alambda_gal[line]/2.5))
-             X = 10**(Alambda_gal[line]/2.5)
-             X_err = 2.303 * X * Alambda_gal_err[line]
-    #         if line[0] == 'F':
-    #             line_err = data[line+'_Err'].loc[galname]/data[line].loc[galname]
-    #             data_dext[line+'_Err'].loc[galname] = data_dext[line].loc[galname]*(line_err**2 + (X_err/X)**2)**0.5
-     #        else:
-             line_err = data[line+'_err'].loc[galname]/data[line].loc[galname]
-             data_dext[line+'_err'].loc[galname] = data_dext[line].loc[galname]*(line_err**2 + (X_err/X)**2)**0.5
-                                 
+
+
+#for galname in data.index.values:
+#    print galname
+#    #factor to relate each mw lam and color excess    
+#    #ext['Al_Ebv']*EBV_excess[i] #for particular galaxy
+#    #there is a mw_A_atmwlam for each galaxy, this index is the same for all
+#    
+#    #if np.isfinite(EBV_excess.loc[galname]): 
+#        #Extinction for each line in a galaxy is given by
+#        # A_lambda_gal = A_lambda/E(B-V) * E(B-V)_gal
+#    Alambda_gal = {line : Alambda_Ebv[line]*EBV_excess.loc[galname] \
+#                            for line in wavelengths.keys()}
+#    Alambda_gal_err = {line : Alambda_Ebv[line]*EBV_excess_err.loc[galname] \
+#                            for line in wavelengths.keys()}
+#            #output is dextincted avg flux for each line in each galaxy
+#    for line in wavelengths.keys():
+#         if line in data.keys():
+#             data_dext[line].loc[galname] = (data[line].loc[galname]*
+#                                         10.0**(Alambda_gal[line]/2.5))
+#             X = 10**(Alambda_gal[line]/2.5)
+#             X_err = 2.303 * X * Alambda_gal_err[line]
+#    #         if line[0] == 'F':
+#    #             line_err = data[line+'_Err'].loc[galname]/data[line].loc[galname]
+#    #             data_dext[line+'_Err'].loc[galname] = data_dext[line].loc[galname]*(line_err**2 + (X_err/X)**2)**0.5
+#     #        else:
+#             line_err = data[line+'_err'].loc[galname]/data[line].loc[galname]
+#             data_dext[line+'_err'].loc[galname] = data_dext[line].loc[galname]*(line_err**2 + (X_err/X)**2)**0.5
+#                                 
+
+
 #print data_dext.loc[galname]         
 #data_dext.to_csv(outputfile)
 #####################################################################
