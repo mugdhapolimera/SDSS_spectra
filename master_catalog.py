@@ -14,21 +14,22 @@ from astropy import units as u
 from astropy.coordinates import SkyCoord
 from scipy.io.idl import readsav
 import numpy as np
+from astropy.stats import binom_conf_interval
 
 os.chdir('C:\Users\mugdhapolimera\github\SDSS_spectra/')
 resolveflag = 1
 ecoflag = 0
 fullflag = 0
-makemaster = 1
+makemaster = 0
 if resolveflag: 
     resolve = pd.read_csv('RESOLVE_full_raw.csv', index_col = 'name')
-    jhuflag = pd.read_csv('resolve_emlineclass_full_bary_jhu_new.csv', index_col = 'galname')
-    portflag = pd.read_csv('resolve_emlineclass_full_bary_port_new.csv', index_col = 'galname')
-    nsaflag = pd.read_csv('resolve_emlineclass_full_snr5_nsa.csv', index_col = 'galname')
+    jhuflag = pd.read_csv('resolve_emlineclass_dext_snr5_jhu.csv', index_col = 'galname')
+    portflag = pd.read_csv('resolve_emlineclass_dext_snr5_port.csv', index_col = 'galname')
+    nsaflag = pd.read_csv('resolve_emlineclass_dext_snr5_nsa.csv', index_col = 'galname')
     
-    port = pd.read_csv('RESOLVE_full_hasnr5_port.csv', index_col = 'name')#[portflag.sftoagn]
-    jhu = pd.read_csv('RESOLVE_full_hasnr5_jhu.csv', index_col = 'name')#[jhuflag.sftoagn]
-    #nsa = pd.read_csv('RESOLVE_full_snr5_nsa.csv', index_col = 'resname')#.loc[nsaflag.index.values[nsaflag.sftoagn]]
+    port = pd.read_csv('RESOLVE_full_snr5_dext_port.csv', index_col = 'name')#[portflag.sftoagn]
+    jhu = pd.read_csv('RESOLVE_full_snr5_dext_jhu.csv', index_col = 'name')#[jhuflag.sftoagn]
+    nsa = pd.read_csv('RESOLVE_full_snr5_dext_nsa.csv', index_col = 'name')#.loc[nsaflag.index.values[nsaflag.sftoagn]]
 
 #if fullflag: 
 #    resolve = pd.read_csv('ECO+RESOLVE_full_blend_dext_new.csv', index_col = 'name')
@@ -48,17 +49,21 @@ if ecoflag:
 #    port = pd.read_csv('ECO_full_bary_port.csv', index_col = 'name')#[portflag.sftoagn]
 #    jhu = pd.read_csv('ECO_full_bary_jhu.csv', index_col = 'name')#[jhuflag.sftoagn]
 #    nsa = pd.read_csv('NSA_ECO_snr5.csv', index_col = 'name')#.loc[nsaflag.index.values[nsaflag.sftoagn]]
-
-    resolve = pd.read_csv('ECO_live22Oct2018.csv', index_col = 'name')
-    jhuflag = pd.read_csv('eco_emlineclass_full_hasnr5_jhu_new.csv', index_col = 'galname')
-    portflag = pd.read_csv('eco_emlineclass_full_hasnr5_port_new.csv', index_col = 'galname')
-    #nsaflag = pd.read_csv('eco_emlineclass_full_snr5_nsa.csv', index_col = 'galname')
+    resolve = pd.read_csv('ECO_full_raw.csv', index_col = 'name')
+    os.chdir('C:\Users\mugdhapolimera\github\SDSS_spectra\ECO\SEL')
+    jhuflag = pd.read_csv('eco_emlineclass_dext_snr5_jhu.csv', index_col = 'galname')
+    portflag = pd.read_csv('eco_emlineclass_dext_snr5_port.csv', index_col = 'galname')
+    nsaflag = pd.read_csv('eco_emlineclass_dext_snr5_nsa.csv', index_col = 'galname')
     
-    port = pd.read_csv('ECO_full_hasnr5_port.csv', index_col = 'name')#[portflag.sftoagn]
-    jhu = pd.read_csv('ECO_full_hasnr5_jhu.csv', index_col = 'name')#[jhuflag.sftoagn]
-    #nsa = pd.read_csv('NSA_ECO_snr5.csv', index_col = 'name')#.loc[nsaflag.index.values[nsaflag.sftoagn]]
+    port = pd.read_csv('ECO_full_snr5_dext_port.csv', index_col = 'name')#[portflag.sftoagn]
+    jhu = pd.read_csv('ECO_full_dext_snr5_jhu.csv', index_col = 'name')#[jhuflag.sftoagn]
+    nsa = pd.read_csv('ECO_full_snr5_dext_nsa.csv', index_col = 'name')#.loc[nsaflag.index.values[nsaflag.sftoagn]]
+jhuname = list(jhu.index)
+portname = list(port.index)
+nsaname = list(nsa.index)
 
-allunq = np.unique(list(jhu.index) + list(port.index))   #+ list(nsa.index) 
+
+allunq = np.unique(list(jhu.index) + list(port.index)+ list(nsa.index)) 
 #sftoagn = df[ambigsel1 & dwarf][['radeg','dedeg']]
 
 #sfagn = pd.read_csv('uniquesfagn.csv')
@@ -100,13 +105,100 @@ jhukeys = ['nii_6548_flux', 'nii_6548_flux_err',
            'h_alpha_flux', 'h_alpha_flux_err']
 
 jhuagn = jhuflag.sftoagn | jhuflag.composite | jhuflag.defagn | jhuflag.agntosf
-#nsaagnflag = nsaflag.sftoagn | nsaflag.composite | nsaflag.defagn
-portagnflag = portflag.sftoagn | portflag.composite | portflag.defagn | portflag.agntosf
+nsaagn = nsaflag.sftoagn | nsaflag.composite | nsaflag.defagn | nsaflag.agntosf
+portagn = portflag.sftoagn | portflag.composite | portflag.defagn | portflag.agntosf
+
+jhudwarf = jhu.logmstar < 9.5
+portdwarf = port.logmstar < 9.5
+nsadwarf = nsa.logmstar < 9.5
+
+jhudwarfagn = jhudwarf & jhuagn
+portdwarfagn = portdwarf & portagn
+nsadwarfagn = nsadwarf & nsaagn
+
+print('JHU and Port', 'JHU and NSA', 'NSA and Port')
+jhuandport = list(set(list(jhu.index)) & set(list(port.index)))
+jhuandnsa = list(set(list(jhu.index)) & set(list(nsa.index)))
+nsaandport = list(set(list(nsa.index)) & set(list(port.index)))
+print(len(jhuandport), len(jhuandnsa), len(nsaandport))
+
+jhuandportdwarfs = list(set(list(jhu[jhudwarf].index)) & set(list(port[portdwarf].index)))
+jhuandnsadwarfs = list(set(list(jhu[jhudwarf].index)) & set(list(nsa[nsadwarf].index)))
+nsaandportdwarfs = list(set(list(nsa[nsadwarf].index)) & set(list(port[portdwarf].index)))
+print (len(jhuandportdwarfs), len(jhuandnsadwarfs), len(nsaandportdwarfs))
+
+jhuandportdwarfagn = list(set(list(jhu[jhudwarfagn].index)) & set(list(port[portdwarfagn].index)))
+jhuandnsadwarfagn = list(set(list(jhu[jhudwarfagn].index)) & set(list(nsa[nsadwarfagn].index)))
+nsaandportdwarfagn = list(set(list(nsa[nsadwarfagn].index)) & set(list(port[portdwarfagn].index)))
+print (len(jhuandportdwarfagn), len(jhuandnsadwarfagn), len(nsaandportdwarfagn))
+
+print (len(jhuandportdwarfagn), len(jhuandnsadwarfagn), len(nsaandportdwarfagn))
+print (100.0*len(jhuandportdwarfagn)/len(jhuandportdwarfs), \
+       100.0*binom_conf_interval(len(jhuandportdwarfagn),len(jhuandportdwarfs)) -\
+       100.0*len(jhuandportdwarfagn)/len(jhuandportdwarfs))
+print (100.0*len(jhuandnsadwarfagn)/len(jhuandnsadwarfs),\
+       100.0*binom_conf_interval(len(jhuandnsadwarfagn),len(jhuandnsadwarfs)) -\
+       100.0*len(jhuandnsadwarfagn)/len(jhuandnsadwarfs))
+print (100.0*len(nsaandportdwarfagn)/len(nsaandportdwarfs),\
+       100.0*binom_conf_interval(len(nsaandportdwarfagn),len(nsaandportdwarfs))-\
+       100.0*len(nsaandportdwarfagn)/len(nsaandportdwarfs))
+
+print('JHU or Port', 'JHU or NSA', 'NSA or Port')
+jhuorport = list(set(list(jhu.index)) | set(list(port.index)))
+jhuornsa = list(set(list(jhu.index)) | set(list(nsa.index)))
+nsaorport = list(set(list(nsa.index)) | set(list(port.index)))
+print(len(jhuorport), len(jhuornsa), len(nsaorport))
+
+jhuorportdwarfs = list(set(list(jhu[jhudwarf].index)) | set(list(port[portdwarf].index)))
+jhuornsadwarfs = list(set(list(jhu[jhudwarf].index)) | set(list(nsa[nsadwarf].index)))
+nsaorportdwarfs = list(set(list(nsa[nsadwarf].index)) | set(list(port[portdwarf].index)))
+print (len(jhuorportdwarfs), len(jhuornsadwarfs), len(nsaorportdwarfs))
+
+jhuorportdwarfagn = list(set(list(jhu[jhudwarfagn].index)) | set(list(port[portdwarfagn].index)))
+jhuornsadwarfagn = list(set(list(jhu[jhudwarfagn].index)) | set(list(nsa[nsadwarfagn].index)))
+nsaorportdwarfagn = list(set(list(nsa[nsadwarfagn].index)) | set(list(port[portdwarfagn].index)))
+print (len(jhuorportdwarfagn), len(jhuornsadwarfagn), len(nsaorportdwarfagn))
+print (100.0*len(jhuorportdwarfagn)/len(jhuorportdwarfs), \
+       100.0*binom_conf_interval(len(jhuorportdwarfagn),len(jhuorportdwarfs))-\
+       100.0*len(jhuorportdwarfagn)/len(jhuorportdwarfs))
+print (100.0*len(jhuornsadwarfagn)/len(jhuornsadwarfs),\
+       100.0*binom_conf_interval(len(jhuornsadwarfagn),len(jhuornsadwarfs))-\
+       100.0*len(jhuornsadwarfagn)/len(jhuornsadwarfs))
+print (100.0*len(nsaorportdwarfagn)/len(nsaorportdwarfs),\
+       100.0*binom_conf_interval(len(nsaorportdwarfagn),len(nsaorportdwarfs))-\
+       100.0*len(nsaorportdwarfagn)/len(nsaorportdwarfs))
+
+
+print('JHU or Port or NSA')
+jhuorportornsa = list(set(list(jhu.index)) | set(list(port.index)) | set(list(nsa.index)))
+print (len(jhuorportornsa))
+
+jhuorportornsadwarfs = list(set(list(jhu[jhudwarf].index)) | set(list(port[portdwarf].index)) | set(list(nsa[nsadwarf].index)))
+print (len(jhuorportornsadwarfs))
+
+jhuorportornsadwarfagn = list(set(list(jhu[jhudwarfagn].index)) | set(list(port[portdwarfagn].index)) | set(list(nsa[nsadwarfagn].index)))
+print (len(jhuorportornsadwarfagn))
+print(100.0*len(jhuorportornsadwarfagn)/len(jhuorportornsadwarfs),\
+      100.0*binom_conf_interval(len(jhuorportornsadwarfagn),len(jhuorportornsadwarfs))-\
+      100.0*len(jhuorportornsadwarfagn)/len(jhuorportornsadwarfs))
+
+print('JHU and Port and NSA')
+jhuandportandnsa = list(set(list(jhu.index)) & set(list(port.index)) & set(list(nsa.index)))
+print (len(jhuandportandnsa))
+
+jhuandportandnsadwarfs = list(set(list(jhu[jhudwarf].index)) & set(list(port[portdwarf].index)) & set(list(nsa[nsadwarf].index)))
+print (len(jhuandportandnsadwarfs))
+
+jhuandportandnsadwarfagn = list(set(list(jhu[jhudwarfagn].index)) & set(list(port[portdwarfagn].index)) & set(list(nsa[nsadwarfagn].index)))
+print (len(jhuandportandnsadwarfagn))
+print(100.0*len(jhuandportandnsadwarfagn)/len(jhuandportandnsadwarfs),\
+      100.0*binom_conf_interval(len(jhuandportandnsadwarfagn),len(jhuandportandnsadwarfs))-\
+      100.0*len(jhuandportandnsadwarfagn)/len(jhuandportandnsadwarfs))
 #nsaagn = nsaflag.index.values[nsaagnflag]
-portagn = portflag.index.values[portagnflag]
+#portagn = portflag.index.values[portagnflag]
 #nsasf = nsaflag.index.values[nsaflag.defstarform]
-portsf = portflag.index.values[portflag.defstarform]
-jhusf = jhuflag.index.values[jhuflag.defstarform]
+#portsf = portflag.index.values[portflag.defstarform]
+#jhusf = jhuflag.index.values[jhuflag.defstarform]
 
 if makemaster: 
 
@@ -139,12 +231,12 @@ if makemaster:
     if ecoflag:
         df.to_csv('ECO_snr5_master_hasnr5.csv')
     if resolveflag:
-        df.to_csv('RESOLVE_hasnr5_master.csv')
+        df.to_csv('RESOLVE_snr5_master_new.csv')
     if fullflag:
         df.to_csv('ECO+RESOLVE_snr5_master_new.csv')
 
     master = df
-
+'''
 if resolveflag : 
     master = pd.read_csv('RESOLVE_snr5_master_bary.csv')
 if ecoflag : 
@@ -203,6 +295,6 @@ sami = ['rs0010']#, 'rs0775']
 manga = ['rf0503']
 #targetlist = targetlist.drop(manga)
 #targetlist = targetlist.drop(sami)
-
+'''
 
 

@@ -16,17 +16,24 @@ from scipy.io.idl import readsav
 resfull = pd.read_csv('RESOLVE_snr5_master_new.csv')
 #resflag = pd.read_csv('resolve_emlineclass_full_snr5_master_new.csv')
 #resconf = pd.read_csv('RESOLVE_snr5_master_conf_bary.csv')
-resfullbary = pd.read_csv('RESOLVE_snr5_master_bary.csv')
+resfullbary = pd.read_csv('RESOLVE_full_dext_snr5_jhu.csv')
 resexcluded = [x for x in list(resfull.name) if x not in list(resfullbary.name)]
 
 resfull = resfullbary
-resflag = pd.read_csv('resolve_emlineclass_full_bary_master_new.csv')
-resconf = pd.read_csv('RESOLVE_snr5_master_conf_bary.csv')
+resflag = pd.read_csv('resolve_emlineclass_dext_snr5_jhu.csv')
+resflagagn = resflag.sftoagn | resflag.agntosf | resflag.defagn | resflag.composite
+resconf = pd.DataFrame({'name': resflag.galname,
+                        'confidence_level': resflagagn*1.0,
+                        'jhu' : resflagagn*1.0,
+                        'port': np.zeros(len(resflag.galname))})
+resconf.confidence_level[resconf.confidence_level == 0] = -1
+#resconf = pd.read_csv('RESOLVE_snr5_master_conf_bary.csv')
+
 resfull['logmbary'] = np.log10(10**resfull.logmstar + 10**resfull.logmgas)
 resfull.index = resfull.name
 resflag.index = resflag.galname
 resconf.index = resconf.name
-resconf.confidence_level = resconf.jhu + resconf.port
+#resconf.confidence_level = resconf.jhu + resconf.port
 
 rescatphot = readsav('resolvecatalogphot.dat')
 rescat = readsav('resolvecatalog.dat')
@@ -48,12 +55,12 @@ resconf = resconf.loc[res.name]
 ecofull = pd.read_csv('ECO_snr5_master_new.csv')
 #ecofullflag = pd.read_csv('eco_emlineclass_full_snr5_master_new.csv')
 #ecoconf = pd.read_csv('ECO_snr5_master_conf_bary.csv')
-ecofullbary = pd.read_csv('ECO_snr5_master_bary.csv')
+ecofullbary = pd.read_csv('ECO_full_dext_snr5_jhu.csv')
 ecoexcluded = [x for x in list(ecofull.name) if x not in list(ecofullbary.name)]
 
 ecofull = ecofullbary
-ecofullflag = pd.read_csv('eco_emlineclass_full_bary_master_new.csv')
-ecoconf = pd.read_csv('ECO_snr5_master_conf_bary.csv')
+ecofullflag = pd.read_csv('eco_emlineclass_dext_snr5_jhu.csv')
+#ecoconf = pd.read_csv('ECO_snr5_master_conf_bary.csv')
 ecofull.index = ecofull.name
 ecofullflag.index = ecofullflag.galname
 ecofull['logmbary'] = np.log10(10**ecofull.logmstar + 10**ecofull.logmgas)
@@ -68,11 +75,17 @@ econdx = (((ecofull.cz < 4500) | (ecofull.dedeg < 0) | (ecofull.dedeg > 5))) #| 
 #         (ecofull.resname == 'notinresolve') )
 #eco = ecofull[econdx]
 #ecoflag = ecofullflag[econdx]
-ecoconf.index = ecoconf.name
-ecoconf.confidence_level = ecoconf.jhu + ecoconf.port
+#ecoconf.index = ecoconf.name
+#ecoconf.confidence_level = ecoconf.jhu + ecoconf.port
 eco = ecofull[econdx & ((ecofull.logmbary > 9.2))]# | (ecofull.absrmag < -17.33))] 
 ecoflag = ecofullflag[econdx & ((ecofull.logmbary > 9.2))]# | (ecofull.absrmag < -17.33))]
-ecoconf = ecoconf.loc[eco.name]
+#ecoconf = ecoconf.loc[eco.name]
+ecoflagagn = ecoflag.sftoagn | ecoflag.agntosf | ecoflag.defagn | ecoflag.composite
+ecoconf = pd.DataFrame({'name': ecoflag.galname,
+                        'confidence_level': ecoflagagn*1.0,
+                        'jhu' : ecoflagagn*1.0,
+                        'port': np.zeros(len(ecoflag.galname))})
+ecoconf.confidence_level[ecoconf.confidence_level == 0] = -1
 
 #ecoflag['defstarform'][ecoconf.confidence_level < 1] = True
 #ecoflag['sftoagn'][ecoconf.confidence_level < 1] = False
@@ -352,11 +365,11 @@ ecojhuandport = (ecoconf.confidence_level == 2) | \
 ecojhuandportname_agn = list(ecoconf.loc[ecodwarfagn.name][ecoconf.confidence_level == 2].name)
 ecojhuandportname = list(ecoconf.loc[ecodwarf.name][ecojhuandport].name)
 
-resdwarf = resdwarf.loc[resjhuandportname]
-resdwarfagn = resdwarfagn.loc[resjhuandportname_agn]
-
-ecodwarf = ecodwarf.loc[ecojhuandportname]
-ecodwarfagn = ecodwarfagn.loc[ecojhuandportname_agn]
+#resdwarf = resdwarf.loc[resjhuandportname]
+#resdwarfagn = resdwarfagn.loc[resjhuandportname_agn]
+#
+#ecodwarf = ecodwarf.loc[ecojhuandportname]
+#ecodwarfagn = ecodwarfagn.loc[ecojhuandportname_agn]
 
 ecodwarfagn_hist = np.histogram(ecodwarfagn.logmh, bins = bins)
 resdwarfagn_hist = np.histogram(resdwarfagn.logmh, bins = bins)
@@ -372,11 +385,11 @@ resnonisodwarf = resdwarf[resdwarf.grpn > 1]
 ecocendwarfagn = ecodwarfagn[ecodwarfagn.fc == 1]
 rescendwarfagn = resdwarfagn[resdwarfagn.fc == 1]
 ressatdwarfagn = resdwarfagn[resdwarfagn.fc == 0]
+ressatdwarf = resdwarf[resdwarf.fc == 0]
+rescendwarf = resdwarf[resdwarf.fc == 1]
 ecosatdwarfagn = ecodwarfagn[ecodwarfagn.fc == 0]
 ecosatdwarf = ecodwarf[ecodwarf.fc == 0]
 ecocendwarf = ecodwarf[ecodwarf.fc == 1]
-ressatdwarf = resdwarf[resdwarf.fc == 0]
-rescendwarf = resdwarf[resdwarf.fc == 1]
 
 ##ECO Dwarf AGN % breakdown by type
 ecodwarfagnpc = len(ecodwarfagn)*100.0/len(ecodwarf)
@@ -477,12 +490,12 @@ ecopc_up = [ecodwarfagnpc_up, ecoisodwarfagnpc_up, econonisodwarfagnpc_up, ecoce
          ecosatdwarfagnpc_up]
                                                                     
 plt.figure()
-plt.suptitle('Mass limited sample; AGN w/ conf = 2')
-plt.errorbar(xaxis, respc, fmt= 'bs', yerr = [-1.0*np.array(respc_low), respc_up])
+#plt.suptitle('Mass limited sample; AGN w/ conf = 2')
+plt.errorbar(xaxis, respc, fmt= 'bs', yerr = [-1.0*np.array(respc_low), respc_up], label = 'RESOLVE')
 plt.xticks(xaxis, ['Overall', 'Iso. Dwarf', 'Non-iso. Dwarf', 'Cen. Dwarf', 'Sat. Dwarf'])
-plt.errorbar(xaxis+0.2, ecopc, fmt= 'rs', yerr = [-1.0*np.array(ecopc_low), ecopc_up])
+plt.errorbar(xaxis+0.2, ecopc, fmt= 'rs', yerr = [-1.0*np.array(ecopc_low), ecopc_up], label = 'ECO (excluding RESOLVE-A)')
 plt.ylabel('AGN % in Dwarf SELs')
-
+plt.legend()
                                                                     
 plt.figure()
 plt.hist(econonisodwarf.logmh, bins = bins, label = 'ECO non-iso dwarf SELs',
@@ -902,19 +915,23 @@ ax.set_aspect(aspect=0.0667)
 ax.plot(ecoparent.radeg/15,ecoparent.dedeg,'k.', alpha  = 0.1,mew = 0)
 ax.plot(ecofull.radeg/15,ecofull.dedeg,'k.', alpha  = 0.3,mew = 0)
 agngrps = ecodwarfagn.grp[ecodwarfagn.logmbary < 9.2]
-for i in agngrps:
-    gals = (ecoparent.grp == i)
-    #plt.figure('ECO Group '+str(i))
-    plt.plot(ecoparent.radeg[gals]/15,ecoparent.dedeg[gals],'bo')
-    central = (ecoparent[gals].fc == 1)
-    #plt.plot(ecoparent[gals].radeg[central]/15,ecoparent[gals].dedeg[central], \
-    #         'bo',ms = 10)
+#for i in agngrps:
+#    gals = (ecoparent.grp == i)
+#    #plt.figure('ECO Group '+str(i))
+#    plt.plot(ecoparent.radeg[gals]/15,ecoparent.dedeg[gals],'bo')
+#    central = (ecoparent[gals].fc == 1)
+#    #plt.plot(ecoparent[gals].radeg[central]/15,ecoparent[gals].dedeg[central], \
+#    #         'bo',ms = 10)
+#    
+#    dwarfagningrp = (ecodwarfagn.grp == i)
+#    #plt.plot(ecodwarfagn.radeg[dwarfagningrp]/15,ecodwarfagn.dedeg[dwarfagningrp],'ro')
     
-    dwarfagningrp = (ecodwarfagn.grp == i)
-    #plt.plot(ecodwarfagn.radeg[dwarfagningrp]/15,ecodwarfagn.dedeg[dwarfagningrp],'ro')
-    
-    plt.xlabel('RA (hours)')
-    plt.ylabel('Dec')
+plt.xlabel('RA (hours)')
+plt.ylabel('Dec')
+plt.plot(ecosatdwarf.radeg/15,ecosatdwarf.dedeg,'bo')
+plt.plot(ecosatdwarfagn.radeg/15,ecosatdwarfagn.dedeg,'ro')
+plt.plot(ressatdwarf.radeg/15,ressatdwarf.dedeg,'go')
+plt.plot(ressatdwarfagn.radeg/15,ressatdwarfagn.dedeg,'mo')
 xaxis = np.arange(8.5,16.5,0.1)
 ax.plot(xaxis, 5*np.ones(len(xaxis)),'r-.')
 
@@ -976,6 +993,59 @@ ecog3 = ecog3full[ecog3ndx]
 agninlargegrp = list(ecodwarfagn.name[(ecodwarfagn.logmh > 13.0) & \
                                     (ecodwarfagn.logmh < 13.5)])
 
+###############################################################################
+bins = np.arange(10.5,15,0.5)
+plt.figure()
+plt.hist(ecosatdwarf.logmh, bins = bins, histtype = 'step', lw = 3, 
+         color = 'blue',  normed = True, label = 'ECO Dwarf Sat. (excluding RES-A)')
+plt.hist(ecosatdwarfagn.logmh, bins = bins, histtype = 'step', lw = 3, 
+         normed = True, color = 'red', label = 'ECO Dwarf Sat. AGN')
+plt.hist(ressatdwarf.logmh, bins = bins, histtype = 'step', lw = 3, 
+         color = 'green',  normed = True, label = 'RESOLVE Dwarf Sat.')
+plt.legend()
+
+resadwarfdenndx = ~econdx & (ecofull.logmstar < 9.5) & (ecofull.den1mpc > -99)
+resaden = ecofull.den1mpc[resadwarfdenndx]
+
+###############################################################################
+bins = np.arange(0,4,0.5)
+plt.figure()
+plt.hist(ecosatdwarf.den1mpc, bins = bins, histtype = 'step', lw = 3, 
+         color = 'blue',  normed = True, label = 'ECO Dwarf Sat. (excluding RES-A)')
+plt.hist(ecosatdwarfagn.den1mpc, bins = bins, histtype = 'step', lw = 3, 
+         normed = True, color = 'red', label = 'ECO Dwarf Sat. AGN')
+plt.hist(resaden, bins = bins, histtype = 'step', lw = 3, 
+         color = 'green',  normed = True , label = 'RESOLVE Dwarf Sat.')
+plt.legend()
+
+###############################################################################
+
+ecohasnr = ecosatdwarf.h_alpha_flux/ecosatdwarf.h_alpha_flux_err
+ecooisnr = ecosatdwarf.oi_6300_flux/ecosatdwarf.oi_6300_flux_err
+
+ecoagnhasnr = ecosatdwarfagn.h_alpha_flux/ecosatdwarfagn.h_alpha_flux_err
+ecoagnoisnr = ecosatdwarfagn.oi_6300_flux/ecosatdwarfagn.oi_6300_flux_err
+
+reshasnr = ressatdwarf.h_alpha_flux/ressatdwarf.h_alpha_flux_err
+resoisnr = ressatdwarf.oi_6300_flux/ressatdwarf.oi_6300_flux_err
+
+plt.figure()
+plt.hist(ecohasnr, bins = bins, histtype = 'step', lw = 3, 
+         color = 'blue',  normed = True, label = 'ECO Dwarf Sat. (excluding RES-A)')
+plt.hist(ecoagnhasnr, bins = bins, histtype = 'step', lw = 3, 
+         normed = True, color = 'red', label = 'ECO Dwarf Sat. AGN')
+plt.hist(reshasnr, bins = bins, histtype = 'step', lw = 3, 
+         color = 'green',  normed = True , label = 'RESOLVE Dwarf Sat.')
+plt.legend()
+
+plt.figure()
+plt.hist(ecooisnr, bins = bins, histtype = 'step', lw = 3, 
+         color = 'blue',  normed = True, label = 'ECO Dwarf Sat. (excluding RES-A)')
+plt.hist(ecoagnoisnr, bins = bins, histtype = 'step', lw = 3, 
+         normed = True, color = 'red', label = 'ECO Dwarf Sat. AGN')
+plt.hist(resoisnr, bins = bins, histtype = 'step', lw = 3, 
+         color = 'green',  normed = True , label = 'RESOLVE Dwarf Sat.')
+plt.legend()
     
 ###############################################################################
 #Density vs. Baryonic Mass

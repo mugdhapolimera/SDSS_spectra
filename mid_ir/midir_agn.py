@@ -39,7 +39,7 @@ def satyapaly(x):
 #Reading in RESOLVE catalogs and new WISE photometry and setting up the data
 ##############################################################################
 path = os.getcwd()+'\/'
-resolve = pd.read_csv(path+'RESOLVE_full_blend_dext_new.csv')
+resolve = pd.read_csv('C:\Users\mugdhapolimera\github\SDSS_spectra\RESOLVE_full_raw.csv')
 resolve.index = resolve.name
 
 #Reading in the RESOLVE internal database files
@@ -48,14 +48,14 @@ catalog2 = readsav(path+'resolvecatalog.dat')
 
 #Create a dictionary of mid-IR magnitudes, K-band magnitudes, Surface brightness
 d = {'name' : catalog2['name'],
-              'mw1' : catalog['mw1'],
-              'mw2' : catalog['mw2'],
-              'mw3' : catalog['mw3'],
-              'mw4' : catalog['mw4'],
-              'emw1' : catalog['emw1'],
-              'emw2' : catalog['emw2'],
-              'emw3' : catalog['emw3'],
-              'emw4' : catalog['emw4'],
+              'mw1' : catalog['mw1o'],
+              'mw2' : catalog['mw2o'],
+              'mw3' : catalog['mw3o'],
+              'mw4' : catalog['mw4o'],
+              'emw1' : catalog['emw1o'],
+              'emw2' : catalog['emw2o'],
+              'emw3' : catalog['emw3o'],
+              'emw4' : catalog['emw4o'],
               'kmag' : catalog['kmag'],
               'ekmag' : catalog['ekmag'],
               'ukidsskmag' : catalog['ukidsskmag'],
@@ -186,17 +186,17 @@ plt.ylim(min(w12)-0.1, max(w12)+0.1)
 #             yerr = w12_err[midiragn], label = 'Mid-IR AGN')
 #plt.errorbar(w23['rs0107'],w12['rs0107'],fmt = 'ks', xerr = w23_err['rs0107'],
 #             yerr = w12_err['rs0107'], label = 'rs0107')
-plt.plot(w23,w12,'bo', label = 'Galaxies with reliale WISE mags')
+plt.plot(w23,w12,'bo', alpha = 0.3,label = 'Galaxies with reliale WISE mags')
 plt.plot(w23[midiragn],w12[midiragn],'rs', label = 'Mid-IR AGN')
 #plt.plot(w23['rs0107'],w12['rs0107'],fmt = 'ks', label = 'rs0107')
 
 plt.legend()
 
 midiragnname = df.name[midiragn]
-print(resolve.loc[midiragnname][['radeg','dedeg']])    
+#print(resolve.loc[midiragnname][['radeg','dedeg']])    
 df_midiragn = resolve.loc[midiragnname]
-df_midiragn.to_csv('WISE_Mid_IR-AGN.csv')
-df.to_csv('WISE_good.csv')
+df_midiragn.to_csv('RESOLVE_WISE_AGN.csv')
+df.to_csv('RESOLVE_WISE_good.csv')
 print('{} mid-IR AGN out of {} galaxies having reliable WISE mags : {}%'\
       .format(len(midiragnname), len(df), \
               round(len(midiragnname)*100.0/len(df),2)))
@@ -213,7 +213,37 @@ sfagnndx = [x for x in range(len(df.name)) if df.name[x] in sfagn]
 sfagnmidir = [df.name[midiragn][x] for x in range(len(df.name[midiragn])) \
               if df.name[midiragn][x] in sfagn]
 print sfagnmidir
+cat = ['jhu','port','nsa']
+for c in cat:
+    ressel = pd.read_csv("../RESOLVE_full_snr5_dext_"+c+".csv")
+    midiragn_sel = [x for x in list(df_midiragn.name) if x in list(ressel.name)]
+    df_midiragn.loc[midiragn_sel].to_csv("RESOLVE_snr5_midiragn_"+c+"nsa.csv")
+    if c == 'jhu':
+        jhuiragn = midiragn_sel
+    if c == 'port':
+        portiragn = midiragn_sel
+    if c == 'nsa':
+        nsairagn = midiragn_sel
+print("JHU")
+print jhu.loc[jhuiragn][['radeg','dedeg']]
+print("Portsmouth")
+print port.loc[portiragn][['radeg','dedeg']]
+print("NSA")
+print nsa.loc[nsairagn][['radeg','dedeg']]
 
+print("JHU")
+print jhuflag[jhu.logmstar<9.5].loc[jhuiragn]
+print("Port")
+print portflag[port.logmstar<9.5].loc[portiragn]
+print("NSA")
+print nsaflag[nsa.logmstar<9.5].loc[nsairagn]
+plt.errorbar(w23.loc[jhuiragn],w12.loc[jhuiragn],fmt = 'gs', ms= 10,xerr = w23_err.loc[jhuiragn],
+             yerr = w12_err.loc[jhuiragn], label = 'JHU Mid-IR AGN')
+plt.errorbar(w23.loc[portiragn],w12.loc[portiragn],fmt = 'ks', ms = 10,xerr = w23_err.loc[portiragn],
+             yerr = w12_err.loc[portiragn], label = 'Port Mid-IR AGN')
+plt.errorbar(w23.loc[nsairagn],w12.loc[nsairagn],fmt = 'ms', ms = 10,xerr = w23_err.loc[nsairagn],
+             yerr = w12_err.loc[nsairagn], label = 'NSA Mid-IR AGN')
+plt.legend()
 df_full['kmag_flag'] = kmagflags
 df_full['sb_flag'] = sb
 df_full['wise_good'] = good
