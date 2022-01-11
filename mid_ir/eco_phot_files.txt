@@ -1,0 +1,37 @@
+totalmags_jf2pv5_finalv11.dat	cmags_jf2pv5_finalv9.dat
+totalmags_jf2pv5_finalv12.dat	
+totalmags_nbrc_finalv1.dat	cmags_nbrc_fv1.dat
+totalmags_nbrc_finalv2.dat	cmags_nbrc_fv2.dat
+totalmags_nbrc_finalv3.dat	cmags_nbrc_fv3.dat
+totalmags_nbrc_finalv3_handedit.dat	
+totalmags_nJAfr2_final.dat	cmags_nJAfr2_f.dat
+totalmags_nJAfr2_finalv2.dat	cmags_nJAfr2_fv2.dat
+totalmags_nJAfr2_finalv3.dat	cmags_nJAfr2_fv3.dat
+totalmags_nJAfr2_finalv4.dat	cmags_nJAfr2_fv4.dat
+totalmags_nJAfr2_finalv5.dat	cmags_nJAfr2_fv5.dat
+totalmags_nJAfr2_finalv6.dat	
+totalmags_nJAfr2_finalv7.dat	cmags_nJAfr2_fv7.dat
+totalmags_nJAfr2_finalv8.dat	cmags_nJAfr2_fv8.dat
+totalmags_nJAfr3_finalv10.dat	cmags_nJAfr3_fv10.dat
+totalmags_nJAfr3_finalv11.dat	cmags_nJAfr3_fv11.dat
+totalmags_nJAfr3_finalv12.dat	cmags_nJAfr3_fv12.dat
+totalmags_nJAfr3_finalv9.dat	cmags_nJAfr3_fv9.dat
+totalmags_pja_final.dat	cmags_pja_first.dat
+totalmags_pja2_final.dat	cmags_pja2_first.dat
+totalmags_pja3_final.dat	cmags_pja3_f.dat
+totalmags_pja4_final.dat	cmags_pja4_f.dat
+totalmags_pja4_finalv2.dat	cmags_pja4_fv2.dat
+totalmags_pja4_finalv3.dat	cmags_pja4_fv3.dat
+totalmags_pja4_finalv4.dat	cmags_pja4_fv4.dat
+totalmags_pja4_finalv5.dat	cmags_pja4_fv5.dat
+totalmags_pja4_finalv6.dat	cmags_pja4_fv6.dat
+totalmags_pja4_finalv7.dat	cmags_pja4_fv7.dat
+totalmags_pja4_finalv8.dat	
+totalmags_pja5_finalv10.dat	cmags_pja5_fv10.dat
+totalmags_pja5_finalv11.dat	cmags_pja5_fv11.dat
+totalmags_pja5_finalv12.dat	cmags_pja5_fv8.dat
+totalmags_pja5_finalv9.dat	cmags_pja5_fv9.dat
+totalmags_pjan_final.dat	cmags_pjan_f.dat
+totalmags_pjan_final2.dat	cmags_pjan_f2.dat
+totalmags_pjan_final3.dat	cmags_pjan_f3.dat
+totalmags_pjan_final4.dat	cmags_pjan_f4.dat
