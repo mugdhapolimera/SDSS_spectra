@@ -51,7 +51,8 @@ ecodwarfagn = ecodwarf[eco_agn]
 resdwarfagn = resdwarf[res_agn]
 resdwarfconf = resconf.loc[resdwarf.name]
 ecodwarfconf = ecoconf.loc[ecodwarf.name]
-indexes = ['JHU', 'Portsmouth', 'JHU OR Portsmouth', 'JHU AND Portsmouth']
+indexes = ['JHU', 'Portsmouth', 'JHU OR Portsmouth', 
+           'JHU AND Portsmouth']
 colname = {'JHU': 'jhu', 'Portsmouth':'port',
            'JHU OR Portsmouth': 'jhu+port',
            'JHU AND Portsmouth': 'jhu&port'}

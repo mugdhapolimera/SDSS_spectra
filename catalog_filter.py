@@ -24,12 +24,11 @@ Line fluxes and Errors:
 import numpy as np
 import pandas as pd 
 
-def catfilter(eco, resolve, sdsscat, saveoutput, hasnr, bpt1snr, 
-              inputfile, outputfile, cut):
+def catfilter(eco, resolve, sdsscat, saveoutput, hasnr, bpt1snr, he2,
+              inputfile, outputfile, cut, he2cut):
+    #Filter the sample as per survey definition
+
     if eco: 
-        #inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO_full_blend_dext_new.csv'
-        #NSA_ECO_full.csv'#
-        #outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO_full_hasnr5_jhu"
         df = pd.read_csv(inputfile)
         df.index = df.name
         print (len(df))
@@ -39,47 +38,35 @@ def catfilter(eco, resolve, sdsscat, saveoutput, hasnr, bpt1snr,
         ineco = (130.05 < df.radeg) & (df.radeg < 237.45)
         inobssample = (((df.grpcz >= 3000.) & (df.grpcz <= 7000.)) & 
                        (np.log10(mbary) > 9.2) & ineco)#\
-        #((np.log10(mbary) > 9.2))) #(df.absrmag < -17.3) & 
-    #(df.absrmag < -17.33)
     
-    #In RESOLVE Sample filtering
-    if resolve:
-        #inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/NSA_RESOLVE_full.csv'
-        #if portsmouth: 
-            #outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_snr5_port_new"
-        #if jhu: 
-            #outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_snr5_jhu_new"
-        #if nsa: 
-            #inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/NSA_RESOLVE_full.csv'
-            #outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_bpt1snr5_nsa"
-    
+    if resolve:    
         df = pd.read_csv(inputfile)
         df.index = df.name
-        print len(df)
+        print(len(df))
         ra=df.radeg
         dec=df.dedeg
         flinsample = df.fl_insample
         grpcz = df.grpcz
         cz = df.cz
-        infall = (ra > 22*15.) | (ra < 3*15.)
-        inspring = (ra > 8.75*15.) & (ra < 15.75*15.)
+        infall = ((ra > 22*15.) | (ra < 3*15.)) & ((dec > -1.25) & (dec < 1.25))
+        inspring = (ra > 8.75*15.) & (ra < 15.75*15.) & ((dec > 0) & (dec < 5))
         mgas = df.logmgas
         mstars = df.logmstar
         mbary = 10**mgas + 10**mstars
-    #    inobssample = ((grpcz >= 4500.) & (grpcz <= 7000.)) & \
-    #    (((flinsample | (np.log10(mbary) > 9.0)) & infall) | \
-    #            ((flinsample | (np.log10(mbary) > 9.2)) & inspring))
-        inobssample = (((grpcz >= 4500.) & (grpcz <= 7000.)) & \
-        (np.log10(mbary) > 9.2))
+        inobssample = ((grpcz >= 4500.) & (grpcz <= 7000.)) & \
+        (((flinsample | (np.log10(mbary) > 9.0)) & infall) | \
+                ((flinsample | (np.log10(mbary) > 9.2)) & inspring))
+#        inobssample = (((grpcz >= 4500.) & (grpcz <= 7000.)) & \
+#        (np.log10(mbary) > 9.2))
+        df[inobssample].to_csv("RESOLVE_inobssample.csv")
     
     
-    #for ECO
     #Line FLuxes Filtering
     floor = 10**-3
     ceil = 1e5
     df = df[inobssample]
     #df.to_csv('RESOLVE_inobssample.csv')
-    print len(df)
+    print(len(df))
     if sdsscat == 'port':
         nii = df['Flux_NII_6583']
         nii_sum = (df['Flux_NII_6583']+ df['Flux_NII_6547'])*3./4
@@ -94,7 +81,8 @@ def catfilter(eco, resolve, sdsscat, saveoutput, hasnr, bpt1snr,
         oi_err = df['Flux_OI_6300_Err']
         sii_sum = df['Flux_SII_6716'] + df['Flux_SII_6730']
         sii_sum_err = np.sqrt(df['Flux_SII_6716_Err']**2 + df['Flux_SII_6730_Err']**2)
-    
+        heii = df['Flux_HeII_4685']
+        heii_err = df['Flux_HeII_4685_Err']
     elif sdsscat =='nsa' or sdsscat == 'jhu':
         nii = df['nii_6584_flux']
         if 'nii_6548_flux' in df.keys():
@@ -153,6 +141,20 @@ def catfilter(eco, resolve, sdsscat, saveoutput, hasnr, bpt1snr,
                 & ~np.isnan(h_alpha) & ~np.isnan(nii_sum) & ~np.isnan(oiii) & 
                 ~np.isnan(h_beta))
     
+    elif he2:
+        snr = ((h_alpha > cut*h_alpha_err) 
+            & (nii_sum > cut*nii_sum_err) & 
+           (oiii > cut*oiii_err) & (oi > cut*oi_err) & (sii_sum > cut*sii_sum_err) 
+           & (h_beta > cut*h_beta_err) &(heii > he2cut*heii_err))
+        gooddata = ((h_alpha > floor) & (nii_sum > floor) & (oiii > floor) & (oi > floor) &
+                (sii_sum > floor) & (h_beta > floor)  & (h_alpha_err > floor) & 
+                (nii_sum_err > floor) & (oiii_err > floor) & 
+                (oi_err > floor) & (sii_sum_err > floor) & (heii > floor) & (heii_err > floor) &
+                (h_alpha < ceil) & (nii_sum < ceil) & (oiii < ceil) & (oi < ceil) &
+                (sii_sum < ceil) & (h_beta < ceil) & 
+                ~np.isnan(h_alpha) & ~np.isnan(nii_sum) & ~np.isnan(oiii) & 
+                ~np.isnan(oi) & ~np.isnan(sii_sum) & ~np.isnan(h_beta) & 
+                    ~np.isnan(heii))
     else:
         snr = ((h_alpha > cut*h_alpha_err) 
             & (nii_sum > cut*nii_sum_err) & 
@@ -167,47 +169,18 @@ def catfilter(eco, resolve, sdsscat, saveoutput, hasnr, bpt1snr,
                 ~np.isnan(h_alpha) & ~np.isnan(nii_sum) & ~np.isnan(oiii) & 
                 ~np.isnan(oi) & ~np.isnan(sii_sum) & ~np.isnan(h_beta))
     print(np.sum(~np.isnan(h_alpha)))
+    if resolve:
+        df[~np.isnan(h_alpha)].to_csv("RESOLVE_raw_"+sdsscat+".csv")
+    if eco:
+        df[~np.isnan(h_alpha)].to_csv("ECO_raw_"+sdsscat+".csv")
     df = df[gooddata]
-    print len(df)
+    print(len(df))
     df = df[snr]
-    print len(df) 
-    #flags = pd.read_csv('C:/Users/mugdhapolimera/github/BPT/resolve_emlineclass_bpt1_new.csv')
-    #flags.index = flags['galname']
-    
-    #df = df[flags['defstarform']]
+    print(len(df)) 
+
     if saveoutput:
-        df.to_pickle(outputfile)
         df.to_csv(outputfile)
-        print len(df)
+        print(len(df))
     
     return df
 
-#old
-#df = df[~np.isnan(df.h_alpha_flux) & (df.h_alpha_flux > floor)
-#        & (df.h_alpha_flux < ceil)]
-#df = df[~np.isnan(df.oiii_5007_flux) & (df.oiii_5007_flux > floor) 
-#        & (df.oiii_5007_flux < ceil)]
-#df = df[~np.isnan(df.nii_6584_flux) & (df.nii_6584_flux > floor)
-#        & (df.nii_6584_flux < ceil)]
-#df = df[~np.isnan(df.nii_6548_flux) & (df.nii_6548_flux > floor)
-#        & (df.nii_6548_flux < ceil)]
-#df = df[~np.isnan(df.h_beta_flux) & (df.h_beta_flux > floor)
-#        & (df.h_beta_flux < ceil)]
-#df = df[~np.isnan(df.oi_6300_flux) & (df.oi_6300_flux > floor)
-#       & (df.oi_6300_flux < ceil)]
-#df = df[~np.isnan(df.sii_6717_flux) & (df.sii_6717_flux > floor)
-#        & (df.sii_6717_flux < ceil)]
-#df = df[~np.isnan(df.sii_6731_flux) & (df.sii_6731_flux > floor)
-#        & (df.sii_6731_flux < ceil)]
-##df = df[~np.isnan(df.heii_4685_flux_port_ext) & 
-##        (df.heii_4685_flux_port_ext > floor) & (df.heii_4685_flux_port_ext < ceil)]
-#snr = 5
-#df = df[(df.h_beta_flux/df.h_beta_flux_err >= snr)]
-#df = df[df.h_alpha_flux/df.h_alpha_flux_err >= snr]
-#df = df[df.oiii_5007_flux/df.oiii_5007_flux_err >=snr ]
-#df = df[df.nii_6584_flux/df.nii_6584_flux_err >= snr ]
-#df = df[df.nii_6548_flux/df.nii_6548_flux_err >= snr ]
-#df = df[df.sii_6717_flux/df.sii_6717_flux_err >=snr ]
-#df = df[df.sii_6731_flux/df.sii_6731_flux_err >=snr ]
-##print len(df)
-#df = df[df.oi_6300_flux/df.oi_6300_flux_err >= snr ]

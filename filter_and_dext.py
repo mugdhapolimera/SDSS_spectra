@@ -15,50 +15,62 @@ from catalog_filter import catfilter
 from SMCandMW_dext import dext
 from extinction_correction import internal_dext
 from extinction_correction import mwforeground_dext as mw_dext
-eco = 0
-resolve = 1
-sdsscat = 'jhu'
+
+eco = 1
+resolve = 0
+full = 0
+sdsscat = 'port'
 saveoutput = 1
 hasnr = 0
 bpt1snr = 0
+he2 = 0
 cut = 5
+he2cut = 0
+
 if eco: 
     if sdsscat =='nsa':
         inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/NSA_ECO_crossmatched.csv'
     else:
         inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO_full_raw.csv'
-    #NSA_ECO_full.csv'#
-    #outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/ECO_full_snr5_nsa.csv"
-    catname = 'ECO'
+    survey = 'ECO'
+
 if resolve:
     inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_raw.csv'
-    #if portsmouth: 
-        #outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_snr5_port.csv"
-    #if jhu: 
-        #outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_full_hasnr5_jhu.csv"
-    if sdsscat =='nsa': 
-        inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/NSA_RESOLVE_crossmatched.csv'#NSA_RESOLVE_full.csv'
-    catname = 'RESOLVE'
-outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/"+catname+\
-                    "_full_hasnr5_"+sdsscat+".csv"
 
+    if sdsscat =='nsa': 
+        inputfile = 'C:/Users/mugdhapolimera/github/SDSS_Spectra/NSA_RESOLVE_crossmatched.csv'
+    survey = 'RESOLVE'
+
+if full: #DO NOT USE FULL OPTION FOR sdsscat='port'. ONE FILE DOES NOT EXIST FOR ECO+RESOLVE
+        inputfile = 'ECO+RESOLVE_full_raw.csv'
+        survey = 'ECO+RESOLVE'
+
+#Modify the outputfile name according to how you filter the sample
+outputfile = "C:/Users/mugdhapolimera/github/SDSS_Spectra/"+survey+\
+                    "_full_snr5"+sdsscat+".csv"
 df = catfilter(eco, resolve, sdsscat, \
-              saveoutput, hasnr, bpt1snr, inputfile, outputfile, cut)
+              saveoutput, hasnr, bpt1snr, he2, inputfile, outputfile, cut, he2cut)
 
 inputfile = outputfile
-#flag = 'jhuname'
-#foremwfile = 'RESOLVE_full_snr5_port_foreground_fiber.csv'
-#extvalfile = 'RESOLVE_SDSS_JHUextvals.csv'
-#foredf = mw_dext(flag, inputfile, foremwfile, extvalfile)
 
-#inputfile = foremwfile
+if sdsscat == 'port':
+    flag = 'portname'
+    foremwfile = survey+'_full_snr5_'+sdsscat+'_foreground_fiber.csv'
+    extvalfile = survey+'_SDSS_JHUextvals.csv'
+    foredf = mw_dext(flag, inputfile, foremwfile, extvalfile)
+
+    inputfile = foremwfile
+
+
 flag = 'smc'
-smcfile = catname+'_full_hasnr5_smcdext_'+sdsscat+'.csv'
+smcfile = survey+'_full_snr5_SMCdext_'+sdsscat+'.csv'
 smcdf = internal_dext(flag, sdsscat, inputfile, smcfile)
 
 flag = 'mw'
-mwfile = catname+'_full_hasnr5_mwdext_'+sdsscat+'.csv'
+mwfile = survey+'_full_snr5_MWdext_'+sdsscat+'.csv'
 mwdf = internal_dext(flag, sdsscat, inputfile, mwfile)
 
-outputfile = catname+'_full_hasnr5_dext_'+sdsscat+'.csv'
+
+#Final output file with 
+outputfile = survey+'_full_snr5_dext_'+sdsscat+'.csv'
 ext_corr = dext(smcfile, mwfile, outputfile)

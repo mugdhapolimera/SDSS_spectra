@@ -65,7 +65,7 @@ def internal_dext(flag, catflag, inputfile, outputfile):
     ########reddening correct###############
     #intrinsic balmer decrement
     
-    balm_dec_int = 2.86 
+    balm_dec_int = 2.86 #3.1 change to 3.1 to test for AGN extinction 
     
     #observed balmer decrement
     if catflag == 'port':
@@ -88,6 +88,7 @@ def internal_dext(flag, catflag, inputfile, outputfile):
                     (balm_dec_obs_err/balm_dec_obs) 
     
     ###################REST FRAME###################
+    EBV_excess.to_csv(inputfile+'EBV_excess_'+'.csv')
     data_dext = data.copy()
     
     #find conversion array for each galaxy at each wavelength
@@ -99,7 +100,7 @@ def internal_dext(flag, catflag, inputfile, outputfile):
     
     
     for galname in data.index.values:
-        print galname
+        print(galname)
         #factor to relate each mw lam and color excess    
         #ext['Al_Ebv']*EBV_excess[i] #for particular galaxy
         #there is a mw_A_atmwlam for each galaxy, this index is the same for all
@@ -169,24 +170,16 @@ def mwforeground_dext(flag, inputfile, outputfile, extvalfile):
 
                   
     ########reddening correct###############
-    #intrinsic balmer decrement
+    #Milky Way foreground extinction 
     EBV_excess = extvals.e_bv_sfd.loc[data.name]
+
+    #per-plate r-band flux rescaling 
     spectofiber = extvals.spectofiber.loc[data.name]
-#    EBV_excess_err= np.ones(len(EBV_excess))
-    
-    ###################REST FRAME###################
+
     data_dext = data.copy()
-    
-    #find conversion array for each galaxy at each wavelength
-    #mw_A_atmwlam  = np.zeros(len(EBV_excess))
-    #lines = [line for line in data.keys() if 'flux' in line.lower()]
-    #if 'flux_ratio_2c' in lines:
-    #    lines.pop(np.where('flux_ratio_2c' in lines)[0])
-    #print lines
-    
-    
+        
     for galname in data.index.values:
-        print galname
+        print(galname)
         Alambda_gal = {line : Alambda_Ebv[line]*EBV_excess.loc[galname] \
                                 for line in wavelengths.keys()}
 
@@ -201,6 +194,5 @@ def mwforeground_dext(flag, inputfile, outputfile, extvalfile):
                      data_dext[line+'_err'].loc[galname] = X*data_dext[line+'_err'].loc[galname]
                                      
         
-    #print data_dext.loc[galname]         
     data_dext.to_csv(outputfile)
     return data_dext

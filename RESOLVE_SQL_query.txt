@@ -6,6 +6,20 @@ FROM #upload u
       JOIN GalSpecLine g ON s.specobjid = g.specobjid
       JOIN emissionLinesPort e ON s.specobjid = e.specobjid
 ###################################################################################################################################################################
+SELECT g.h_alpha_cont, g.h_alpha_cont_err, g.h_beta_cont, g.h_beta_cont_err
+
+FROM #upload u
+      JOIN #x x ON x.up_id = u.up_id
+      JOIN SpecObjAll s ON s.specObjID = x.specObjID
+      JOIN GalSpecLine g ON s.specobjid = g.specobjid
+###################################################################################################################################################################
+SELECT g.h_alpha_eqw, g.h_alpha_eqw_err, g.h_beta_eqw, g.h_beta_eqw_err
+
+FROM #upload u
+      JOIN #x x ON x.up_id = u.up_id
+      JOIN SpecObjAll s ON s.specObjID = x.specObjID
+      JOIN GalSpecLine g ON s.specobjid = g.specobjid
+###################################################################################################################################################################
 SELECT i.e_bv_sfd, g.spectofiber
 
 FROM #upload u

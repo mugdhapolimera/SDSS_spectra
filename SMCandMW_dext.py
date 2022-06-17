@@ -39,7 +39,7 @@ def dext(smcfile, mwfile, outputfile):
     jhucolndx = [x for x in range(len(ext_corr.columns)) if 'flux' in list(ext_corr.columns)[x]]
     portcolndx = [x for x in range(len(ext_corr.columns)) if 'flux' in list(ext_corr.columns)[x]]
     for gal in smc.index.values:
-        print gal    
+        print(gal)    
         if smc.logmstar.loc[gal] < 9:
             ext_corr.loc[gal] = smc.loc[gal]
         elif smc.logmstar.loc[gal] > 10:
@@ -55,7 +55,7 @@ def dext(smcfile, mwfile, outputfile):
                 ext_corr.loc[gal][jhucolndx] = A * smc.loc[gal][jhucolndx] + B * mw.loc[gal][jhucolndx]#[150:225]
             if ~np.isnan(np.array(ext_corr.loc[gal][portcolndx],dtype = float)).all(): #[150:225]
                 ext_corr.loc[gal][portcolndx] = A * smc.loc[gal][portcolndx] + B * mw.loc[gal][portcolndx]#[150:225]
-    print ext_corr
+    print(ext_corr)
     #ext_corr.to_pickle('XMM_AGN_blend.pkl')
     #ext_corr.to_csv('XMM_AGN_blend.csv')
     #ext_corr.to_csv('C:\Users\mugdhapolimera\Desktop\UNC\Courses\Research\SAMI Data\71146\71147_blend.csv')

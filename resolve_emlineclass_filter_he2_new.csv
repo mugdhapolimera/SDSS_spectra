@@ -1,36 +1,3 @@
-agntosf,ambigagn,composite,defagn,defliner,defseyf,defstarform,galname,heiisel,sftoagn
-False,False,False,True,False,True,False,rf0013,False,False
-False,False,False,False,False,False,False,rf0030,True,False
-False,False,False,False,False,False,True,rf0077,False,False
-False,False,False,False,False,False,False,rf0084,True,False
-False,False,False,False,False,False,False,rf0176,True,False
-False,False,False,False,False,False,True,rf0191,False,False
-False,False,False,False,False,False,True,rf0236,False,False
-False,False,False,False,False,False,False,rf0264,True,False
-False,False,False,False,False,False,True,rf0294,False,False
-False,False,False,True,False,True,False,rf0372,True,False
-False,False,False,False,False,False,False,rs0052,True,False
-False,False,False,False,False,False,True,rs0145,False,False
-False,False,False,False,False,False,False,rs0149,True,False
-False,False,False,False,False,False,True,rs0156,False,False
-False,False,False,False,False,False,False,rs0167,True,False
-False,False,False,False,False,False,False,rs0183,True,False
-False,False,False,False,False,False,True,rs0318,False,False
-False,False,False,False,False,False,True,rs0416,False,False
-False,False,False,False,False,False,False,rs0421,True,True
-False,False,False,False,False,False,True,rs0452,False,False
-False,False,False,False,False,False,False,rs0463,True,False
-False,False,False,False,False,False,False,rs0831,True,False
-False,False,False,False,False,False,True,rs0834,False,False
-False,False,False,False,False,False,True,rs0944,False,False
-False,False,False,False,False,False,False,rs0960,True,False
-False,False,False,False,False,False,True,rs0962,False,False
-False,False,False,False,False,False,False,rs0967,True,False
-False,False,False,False,False,False,True,rs0991,False,False
-False,False,False,False,False,False,False,rs1057,True,False
-False,False,False,False,False,False,True,rs1103,False,False
-False,False,False,False,False,False,True,rs1178,False,False
-False,False,False,False,False,False,True,rs1183,False,False
-False,False,False,True,False,True,False,rs1214,False,False
-False,False,False,False,False,False,True,rs1259,False,False
-False,False,False,False,False,False,False,rs1286,True,False
+version https://git-lfs.github.com/spec/v1
+oid sha256:1e2b28b2649e44fe3806a4790adf40e7e9e70c8bb8b1126da2755c181bb9ac5d
+size 2218

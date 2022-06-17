@@ -38,99 +38,101 @@ def satyapaly(x):
 ##############################################################################
 #Reading in RESOLVE catalogs and new WISE photometry and setting up the data
 ##############################################################################
-def midiragnplot(ax):
+def midiragnplot(ax, inobssamplefile, survey, save):
+#    resolve = pd.read_csv('C:\Users\mugdhapolimera\github\SDSS_spectra\RESOLVE_full_raw.csv')
+    inobssample = pd.read_csv(inobssamplefile)
+    inobssample = inobssample.set_index('name')
+    inobssample = inobssample[(10**inobssample.logmstar + 10**inobssample.logmgas) > 10**9.2]
+    inobsname = inobssample.index
     path = "C:\Users\mugdhapolimera\github\SDSS_Spectra\mid_ir\/" #os.getcwd()+'\/'
     os.chdir(path)
-    resolve = pd.read_csv('C:\Users\mugdhapolimera\github\SDSS_spectra\RESOLVE_full_raw.csv')
-    resolve.index = resolve.name
     
     #Reading in the RESOLVE internal database files
-    catalog = readsav(path+'resolvecatalogphot.dat')
-    catalog2 = readsav(path+'resolvecatalog.dat')
+    if survey == 'RESOLVE':
+        catalog = readsav(r'C:\Users\mugdhapolimera\github\SDSS_Spectra\resolvecatalogphot_031622.dat')
+        catalog2 = readsav(r'C:\Users\mugdhapolimera\github\SDSS_Spectra\resolvecatalog_031622.dat')
     
-    #Create a dictionary of mid-IR magnitudes, K-band magnitudes, Surface brightness
-    d = {'name' : catalog2['name'],
-                  'mw1' : catalog['mw1w'],
-                  'mw2' : catalog['mw2w'],
-                  'mw3' : catalog['mw3w'],
-                  'mw4' : catalog['mw4w'],
-                  'emw1' : catalog['emw1w'],
-                  'emw2' : catalog['emw2w'],
-                  'emw3' : catalog['emw3w'],
-                  'emw4' : catalog['emw4w'],
-                  'kmag' : catalog['kmag'],
-                  'ekmag' : catalog['ekmag'],
-                  'ukidsskmag' : catalog['ukidsskmag'],
-                  'ukidsskflag' : catalog['ukidsskflag'],
-                  'mur50' : catalog['mur50'],
-                  'logmstar' : np.log10(catalog2['mstars'])}
-#    d = {'name' : catalog2['name'],
-#                  'mw1' : catalog['mw1o'],
-#                  'mw2' : catalog['mw2o'],
-#                  'mw3' : catalog['mw3o'],
-#                  'mw4' : catalog['mw4o'],
-#                  'emw1' : catalog['emw1o'],
-#                  'emw2' : catalog['emw2o'],
-#                  'emw3' : catalog['emw3o'],
-#                  'emw4' : catalog['emw4o'],
-#                  'kmag' : catalog['kmag'],
-#                  'ekmag' : catalog['ekmag'],
-#                  'ukidsskmag' : catalog['ukidsskmag'],
-#                  'ukidsskflag' : catalog['ukidsskflag'],
-#                  'mur50' : catalog['mur50']}
-#    d = {'name' : catalog2['name'],
-#                  'mw1' : catalog['mw1'],
-#                  'mw2' : catalog['mw2'],
-#                  'mw3' : catalog['mw3'],
-#                  'mw4' : catalog['mw4'],
-#                  'emw1' : catalog['emw1'],
-#                  'emw2' : catalog['emw2'],
-#                  'emw3' : catalog['emw3'],
-#                  'emw4' : catalog['emw4'],
-#                  'kmag' : catalog['kmag'],
-#                  'ekmag' : catalog['ekmag'],
-#                  'ukidsskmag' : catalog['ukidsskmag'],
-#                  'ukidsskflag' : catalog['ukidsskflag'],
-#                  'mur50' : catalog['mur50']}
-    #Changing byter order from IDL dtype format to pandas default dtype
-    for x in d.keys():
-        d[x] = d[x].byteswap().newbyteorder() 
+        #Create a dictionary of mid-IR magnitudes, K-band magnitudes, Surface brightness
+        d = {'name' : catalog2['name'],
+                      'mw1' : catalog['mw1w'],
+                      'mw2' : catalog['mw2w'],
+                      'mw3' : catalog['mw3w'],
+                      'mw4' : catalog['mw4w'],
+                      'emw1' : catalog['emw1w'],
+                      'emw2' : catalog['emw2w'],
+                      'emw3' : catalog['emw3w'],
+                      'emw4' : catalog['emw4w'],
+                      'kmag' : catalog['kmag'],
+                      'ekmag' : catalog['ekmag'],
+                      'ukidsskmag' : catalog['ukidsskmag'],
+                      'ukidsskflag' : catalog['ukidsskflag'],
+                      'mur50' : catalog['mur50'],
+                      'logmstar' : np.log10(catalog2['mstars'])}
+        #Changing byter order from IDL dtype format to pandas default dtype
+        for x in d.keys():
+            d[x] = d[x].byteswap().newbyteorder() 
+    else:
+        catalog = readsav(r'C:\Users\mugdhapolimera\github\SDSS_Spectra\ecofull_wise_wisemask_061322.dat')
+#        catalog = readsav(r'C:\Users\mugdhapolimera\github\SDSS_Spectra\ecoSEL_wise_wisemask_031022.dat')
+        catalog = catalog.resolve_wise['ap'][0]
+#        catalog2 = pd.read_csv(r'C:\Users\mugdhapolimera\github\SDSS_Spectra\sfr_nuv_wisew_ecoSEL_newsnr.txt')
+        ecodat = readsav(r'C:\Users\mugdhapolimera\github\SDSS_Spectra\eco_wresa_032918.dat')
+
+        match, ecodatndx, catalogndx = np.intersect1d(ecodat['names'], 
+                                    catalog['name'], return_indices = True)        
+        #Create a dictionary of mid-IR magnitudes, K-band magnitudes, Surface brightness
+        d = {'name' : np.array(ecodat['econames'][ecodatndx]).byteswap().newbyteorder(),
+              'mw1' : np.array(catalog['mw1']),
+                      'mw2' : np.array(catalog['mw2']),
+                      'mw3' : np.array(catalog['mw3']),
+                      'mw4' : np.array(catalog['mw4']),
+                      'emw1' : np.array(catalog['emw1']),
+                      'emw2' : np.array(catalog['emw2']),
+                      'emw3' : np.array(catalog['emw3']),
+                      'emw4' : np.array(catalog['emw4']),
+#                      'kmag' : catalog['kmag'],
+#                      'ekmag' : catalog['ekmag'],
+#                      'ukidsskmag' : catalog['ukidsskmag'],
+#                      'ukidsskflag' : catalog['ukidsskflag'],
+#                      'mur50' : catalog['mur50'],
+                      'logmstar' : np.array(ecodat['rpgoodmstarsnew'][ecodatndx]).byteswap().newbyteorder()}
+
     #Making a pandas dataframe using the dictionary
     df = pd.DataFrame(data = d)
-    df.index = df.name
-    #Reading in the new WISE photometry values and converting into a pandas DF
-    wise = readsav(path+'resolve_wise_102919.dat')
-    wisedf = pd.DataFrame.from_records(data = wise['resolve_wise'][0][0])
-    wisedf = wisedf.apply(lambda x: x.astype(str(x.dtype).replace('>','')))
-    wisedf.columns = [x.lower() for x in wisedf.columns.values]
-    wisedf.index = wisedf.name
+    df =  df.set_index('name')
     
-    #Update the original DF with the new photometry
-    #SKIP if you want to use the original photometry
-    df.update(wisedf)
-    gama = pd.read_csv('GAMA_WISE_RESOLVE.csv')
-    gama.index = gama.resname
-    reliable = (gama['PHOTFLAG_W1'] > 0) & (gama['PHOTFLAG_W2'] > 0) & \
-                (gama['PHOTFLAG_W3'] > 0)
+#    #Reading in the new WISE photometry values and converting into a pandas DF
+#    wise = readsav(path+'resolve_wise_102919.dat')
+#    wisedf = pd.DataFrame.from_records(data = wise['resolve_wise'][0][0])
+#    wisedf = wisedf.apply(lambda x: x.astype(str(x.dtype).replace('>','')))
+#    wisedf.columns = [x.lower() for x in wisedf.columns.values]
+#    wisedf.index = wisedf.name
+#    
+#    #Update the original DF with the new photometry
+#    #SKIP if you want to use the original photometry
+#    df.update(wisedf)
+#    gama = pd.read_csv('GAMA_WISE_RESOLVE.csv')
+#    gama.index = gama.resname
+#    reliable = (gama['PHOTFLAG_W1'] > 0) & (gama['PHOTFLAG_W2'] > 0) & \
+#                (gama['PHOTFLAG_W3'] > 0)
+#    
+#    overlap = df.loc[gama.resname]
+#    gama_snr = ((gama['mw2']/gama['emw2'] > overlap['mw2']/overlap['emw2']) \
+#                & (gama['mw1']/gama['emw1'] > overlap['mw1']/overlap['emw1']) \
+#                & (gama['mw3']/gama['emw3'] > overlap['mw3']/overlap['emw3']))
+#    res_zero = (df['mw1']==0.0) | (df['mw2']==0.0) | (df['mw3']==0.0)
+#    gama_full = gama.copy()
+#    gama = gama[reliable & res_zero]
     
-    overlap = df.loc[gama.resname]
-    gama_snr = ((gama['mw2']/gama['emw2'] > overlap['mw2']/overlap['emw2']) \
-                & (gama['mw1']/gama['emw1'] > overlap['mw1']/overlap['emw1']) \
-                & (gama['mw3']/gama['emw3'] > overlap['mw3']/overlap['emw3']))
-    res_zero = (df['mw1']==0.0) | (df['mw2']==0.0) | (df['mw3']==0.0)
-    gama_full = gama.copy()
-    gama = gama[reliable & res_zero]
-    
-    zero = list(df.name[df['mw1']==0.0])
     #df.update(gama)
-    inobssample = pd.read_csv('C:/Users/mugdhapolimera/github/SDSS_Spectra/RESOLVE_barysample.csv')
-    inobsname = inobssample.name
 
     df = df.loc[inobsname]    
-
+    df = df.merge(inobssample, on='name')
+    print df.keys()
+    df['logmstar'] = df['logmstar_x']
     df_full = df.copy()
     
-    print('Total RESOLVE galaxies: {}'.format(len(df)))
+    print('Total '+survey+' galaxies: {}'.format(len(df)))
     
     ##############################################################################
     #Performing quality control on the data
@@ -139,41 +141,55 @@ def midiragnplot(ax):
     #Removing nans, 0 and applying S/N > 5 thresholding for the mid-IR mags
     baderr = np.isnan(df.emw1) | np.isnan(df.emw2) | np.isnan(df.emw3) #| \
             #np.isnan(df.emw4)
-    badphot = (df.mw1 == 0.0) & (df.mw2 == 0.0) & (df.mw3 == 0.0) #& \
+    badphot = (df.mw1 <= 0.0) | (df.mw2 <= 0.0) | (df.mw3 <= 0.0) #& \
                 #(df.mw4 == 0.0)
     threshold = 5
-    snr = (df.mw1/df.emw1 > threshold) & (df.mw2/df.emw2 > threshold) & \
-            (df.mw3/df.emw3 > threshold) #& (df.mw4/df.emw4 > threshold)
+    fluxw1=10**(df.mw1/(-2.5))
+    efluxw1=df.emw1*(np.log10(10.0)/(2.5))*fluxw1
+    fluxw2=10**(df.mw2/(-2.5))
+    efluxw2=df.emw2*(np.log10(10.0)/(2.5))*fluxw2
+    fluxw3=10**(df.mw3/(-2.5))
+    efluxw3=df.emw3*(np.log10(10.0)/(2.5))*fluxw3
+    fluxw4=10**(df.mw4/(-2.5))
+    efluxw4=df.emw4*(np.log10(10.0)/(2.5))*fluxw4
+    goodwise1 = ((df.mw1 > 0) & (fluxw1/efluxw1 > 5.0))
+    goodwise2 = ((df.mw2 > 0) & (fluxw2/efluxw2 > 5.0))
+    goodwise3 = ((df.mw3 > 0) & (fluxw3/efluxw3 > 5.0)) 
+    snr = goodwise1 & goodwise2 & goodwise3
+
+
+#    snr = (df.mw1/df.emw1 > threshold) & (df.mw2/df.emw2 > threshold) & \
+#            (df.mw3/df.emw3 > threshold) #& (df.mw4/df.emw4 > threshold)
     good = ~baderr & ~badphot & snr
     #df = df[good] #Removing bad data from the DF
     print('Galaxies with true mags/errors and S/N > {}: {}'.format(threshold, \
           np.sum(good)))
     
-    #Checking UKIDSS and 2MASS k-band magnitudes- 
-    #both k-band mags > 0; 2MASS s/n > 5
-    #df.ukidsskflag = [int(x) for x in df.ukidsskflag if x != '']
-    if 'kmag' in df.keys():
-        good_kmag = ((df['ukidsskflag'] == '   0') & (df['ukidsskmag'] > 0.0)) | \
-                (df['kmag']/df['ekmag'] > 5.0) 
-    
-    #UKIDSS and 2MASS mags should be within 10 percent of each other 
-    #since they have similar wavelength bands
-        kmag_agree = (df['ukidsskmag']/df['kmag'] > 0.90) & \
-                (df['ukidsskmag']/df['kmag'] < 1.1)
-    
-        kmagflags = good_kmag #& kmag_agree
-    #df = df[kmagflags] #Removing data with bad kmags from DF
-        print('Galaxies with reliable k-band mags: {}'.format(np.sum(kmagflags)))
-    
-    #Surface brightness cut
-    if 'mur50' in df.keys():
-        sb_threshold = 23
-        sb = df['mur50'] < sb_threshold
-    #df = df[sb]
-        print('Galaxies with Surface Brightness < {}mags/arcsec^2: {}'\
-              .format(sb_threshold,np.sum(sb)))
-        #df = df[good]# & kmagflags]# & sb]
-    fulldf = df.copy()
+#    #Checking UKIDSS and 2MASS k-band magnitudes- 
+#    #both k-band mags > 0; 2MASS s/n > 5
+#    #df.ukidsskflag = [int(x) for x in df.ukidsskflag if x != '']
+#    if 'kmag' in df.keys():
+#        good_kmag = ((df['ukidsskflag'] == '   0') & (df['ukidsskmag'] > 0.0)) | \
+#                (df['kmag']/df['ekmag'] > 5.0) 
+#    
+#    #UKIDSS and 2MASS mags should be within 10 percent of each other 
+#    #since they have similar wavelength bands
+#        kmag_agree = (df['ukidsskmag']/df['kmag'] > 0.90) & \
+#                (df['ukidsskmag']/df['kmag'] < 1.1)
+#    
+#        kmagflags = good_kmag #& kmag_agree
+#    #df = df[kmagflags] #Removing data with bad kmags from DF
+#        print('Galaxies with reliable k-band mags: {}'.format(np.sum(kmagflags)))
+#    
+#    #Surface brightness cut
+#    if 'mur50' in df.keys():
+#        sb_threshold = 23
+#        sb = df['mur50'] < sb_threshold
+#    #df = df[sb]
+#        print('Galaxies with Surface Brightness < {}mags/arcsec^2: {}'\
+#              .format(sb_threshold,np.sum(sb)))
+#        #df = df[good]# & kmagflags]# & sb]
+#    fulldf = df.copy()
     df= df[good]
     
     ##############################################################################
@@ -240,29 +256,33 @@ def midiragnplot(ax):
              label = 'Mid-IR SF')
     ax.plot(w23[midiragn],w12[midiragn],'p', color = 'orange', ms = 10, mec = 'none',
              label = 'Mid-IR AGN')
+#    ax.plot(w23['rs0775'],w12['rs0775'],'p', color = 'black', ms = 10, mec = 'none',
+#             label = 'rs0775')
     dwarfs = df.logmstar < 9.5
     dwarfagn = dwarfs & midiragn
     ax.plot(w23[dwarfagn],w12[dwarfagn],'kp', ms = 12, mec = 'k', mfc = 'none',
                  label = 'Mid-IR Dwarf AGN')
-    
-    #plt.plot(w23['rs0107'],w12['rs0107'],fmt = 'ks', label = 'rs0107')
     ax.set_ylim(-1.2, 2.2)
     ax.set_xlim(-1.25,6.5)#min(w23)-0.1,max(w23))
     
     ax.legend(loc = 'lower right', fontsize = 18)
     
-    midiragnname = df.name[midiragn]
+    midiragnname = df.index[midiragn]
     #print(resolve.loc[midiragnname][['radeg','dedeg']])    
-    df_midiragn = resolve.loc[midiragnname]
-    
+    df_midiragn = inobssample.loc[midiragnname]
+    print(list(midiragnname))
     df['agnflag'] = False
     df['agnflag'][midiragn] = True
-    df_midiragn.to_csv('RESOLVE_WISE_AGN.csv')
-    df.to_csv('RESOLVE_WISE_good.csv')
+    
+    if save:
+        df_midiragn.to_csv(survey+'_WISE_AGN.csv')
+        df.to_csv(survey+'_WISE_good.csv')
     print('{} mid-IR AGN out of {} galaxies having reliable WISE mags : {}%'\
           .format(len(midiragnname), len(df), \
                   round(len(midiragnname)*100.0/len(df),2)))
-
+    print('Dwarf mid-IR galaxies: ',np.sum(dwarfs))
+    print('Dwarf mid-IR AGN: ',np.sum(dwarfagn))
+    
 ##Flags to check SFing-AGN    
 #flags = pd.read_csv('../resolve_emlineclass_dext_snr5_jhu.csv')
 #flags.index = flags.galname
@@ -398,3 +418,31 @@ def midiragnplot(ax):
 ##    plt.xlim(min(gama[x]),max(gama[x]))
 ##    plt.ylim(min(df_full.loc[gama.resname][x]),max(df_full.loc[gama.resname][x]))
 #
+#    d = {'name' : catalog2['name'],
+#                  'mw1' : catalog['mw1o'],
+#                  'mw2' : catalog['mw2o'],
+#                  'mw3' : catalog['mw3o'],
+#                  'mw4' : catalog['mw4o'],
+#                  'emw1' : catalog['emw1o'],
+#                  'emw2' : catalog['emw2o'],
+#                  'emw3' : catalog['emw3o'],
+#                  'emw4' : catalog['emw4o'],
+#                  'kmag' : catalog['kmag'],
+#                  'ekmag' : catalog['ekmag'],
+#                  'ukidsskmag' : catalog['ukidsskmag'],
+#                  'ukidsskflag' : catalog['ukidsskflag'],
+#                  'mur50' : catalog['mur50']}
+#    d = {'name' : catalog2['name'],
+#                  'mw1' : catalog['mw1'],
+#                  'mw2' : catalog['mw2'],
+#                  'mw3' : catalog['mw3'],
+#                  'mw4' : catalog['mw4'],
+#                  'emw1' : catalog['emw1'],
+#                  'emw2' : catalog['emw2'],
+#                  'emw3' : catalog['emw3'],
+#                  'emw4' : catalog['emw4'],
+#                  'kmag' : catalog['kmag'],
+#                  'ekmag' : catalog['ekmag'],
+#                  'ukidsskmag' : catalog['ukidsskmag'],
+#                  'ukidsskflag' : catalog['ukidsskflag'],
+#                  'mur50' : catalog['mur50']}

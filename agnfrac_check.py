@@ -13,14 +13,19 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from astropy.stats import binom_conf_interval
 from scipy.io.idl import readsav
+cat = 'jhu'
 resfull = pd.read_csv('RESOLVE_snr5_master_new.csv')
 #resflag = pd.read_csv('resolve_emlineclass_full_snr5_master_new.csv')
 #resconf = pd.read_csv('RESOLVE_snr5_master_conf_bary.csv')
-resfullbary = pd.read_csv('RESOLVE_full_dext_snr5_jhu.csv')
+resfullbary = pd.read_csv('RESOLVE_full_snr5_dext_'+cat+'.csv')
+port = pd.read_csv('RESOLVE_full_snr5_dext_port.csv')
+nsa = pd.read_csv('RESOLVE_full_snr5_dext_nsa.csv')
 resexcluded = [x for x in list(resfull.name) if x not in list(resfullbary.name)]
 
 resfull = resfullbary
-resflag = pd.read_csv('resolve_emlineclass_dext_snr5_jhu.csv')
+resflag = pd.read_csv('resolve_emlineclass_dext_snr5_'+cat+'.csv')
+portflag = pd.read_csv('resolve_emlineclass_dext_snr5_port.csv')
+nsaflag = pd.read_csv('resolve_emlineclass_dext_snr5_nsa.csv')
 resflagagn = resflag.sftoagn | resflag.agntosf | resflag.defagn | resflag.composite
 resconf = pd.DataFrame({'name': resflag.galname,
                         'confidence_level': resflagagn*1.0,
@@ -55,11 +60,13 @@ resconf = resconf.loc[res.name]
 ecofull = pd.read_csv('ECO_snr5_master_new.csv')
 #ecofullflag = pd.read_csv('eco_emlineclass_full_snr5_master_new.csv')
 #ecoconf = pd.read_csv('ECO_snr5_master_conf_bary.csv')
-ecofullbary = pd.read_csv('ECO_full_dext_snr5_jhu.csv')
+ecofullbary = pd.read_csv('ECO/SEL/ECO_full_snr5_dext_'+cat+'.csv')
+ecoport = pd.read_csv('ECO/SEL/ECO_full_snr5_dext_port.csv')
+econsa = pd.read_csv('ECO/SEL/ECO_full_snr5_dext_nsa.csv')
 ecoexcluded = [x for x in list(ecofull.name) if x not in list(ecofullbary.name)]
 
 ecofull = ecofullbary
-ecofullflag = pd.read_csv('eco_emlineclass_dext_snr5_jhu.csv')
+ecofullflag = pd.read_csv('ECO/SEL/eco_emlineclass_dext_snr5_'+cat+'.csv')
 #ecoconf = pd.read_csv('ECO_snr5_master_conf_bary.csv')
 ecofull.index = ecofull.name
 ecofullflag.index = ecofullflag.galname
@@ -210,8 +217,8 @@ def agnfrac_dens(galtype = 'all', columnname = 'den1mpc'):
         
     else: #if columnname == 'dens_s':
         if galtype == 'all':
-            eco_sub_ndx = (eco.dens_s > 0) & (eco.logmstar > 0)
-            res_sub_ndx = ~econdx & (ecofull.logmstar > 0) & (ecofull.dens_s > 0)
+            res_sub_ndx = (res[columnname] > 0)
+            eco_sub_ndx = (eco[columnname] > 0)
         elif galtype == 'dwarf':
             res_sub_ndx = (res.logmstar < 9.5) & (res[columnname] > 0)
             eco_sub_ndx = (eco.logmstar < 9.5) & (eco[columnname] > 0)
@@ -232,7 +239,8 @@ def agnfrac_dens(galtype = 'all', columnname = 'den1mpc'):
 
     bins = np.arange(int(min(res_sub[columnname])), \
                      int(max(res_sub[columnname])), 0.2)
-#    res_sub_env = np.zeros(len(bins) - 1)
+    if columnname == 'logmbary':
+        bins = np.arange(9.1, 11.5, 0.2)#    res_sub_env = np.zeros(len(bins) - 1)
 #    eco_sub_env = np.zeros(len(bins) - 1)
 #    res_sub_agn_env = np.zeros(len(bins) - 1)
 #    eco_sub_agn_env = np.zeros(len(bins) - 1)
@@ -311,26 +319,26 @@ bins = np.arange(10.5,15.5,0.5)
 fig = plt.figure()
 ax1 = plt.subplot(121)
 ax1.hist(ecoparent.logmh, bins = bins, histtype = 'step', 
-         edgecolor = 'k', lw = 3, label = 'ECO Parent Sample (excluding RESOLVE-A)')#,normed = True)
+         edgecolor = 'k', lw = 3, label = 'Parent Sample')#,normed = True)
 ax1.hist(eco.logmh, bins = bins, histtype = 'step', hatch = 'x',
-         edgecolor = 'orange', lw = 2, label = 'ECO SELs (excluding RESOLVE-A)')#, normed = True)
+         edgecolor = 'orange', lw = 2, label = 'SELs')#, normed = True)
 #ax1.hist(res.logmh, bins = bins, histtype = 'step', hatch = 'x',
 #         edgecolor = 'orange', lw = 2, ls = '--',
 #         label = 'RESOLVE SELs')#, normed = True)
 #ax1.hist(resparent.logmh, bins = bins, histtype = 'step',  
 #         edgecolor = 'black', lw = 3, ls = '--',
 #         label = 'RESOLVE Parent Sample')#, normed = True)
-ax1.legend()
-ax1.set_xlabel('log(M$_{halo}$/M$_{\odot}$)', fontsize = 15) 
-ax1.set_ylabel('Number of galaxies', fontsize = 15)
+ax1.legend(title = 'ECO (excluding RESOLVE-A)')
+ax1.set_xlabel('log(M$_{halo}$/M$_{\odot}$)')#, fontsize = 15) 
+ax1.set_ylabel('Number of galaxies')#, fontsize = 15)
 ax2 = plt.subplot(122)
 ax2.hist(resparent.logmh, bins = bins, histtype = 'step',  
-         edgecolor = 'black', lw = 3, label = 'RESOLVE Parent Sample')#, normed = True)
+         edgecolor = 'black', lw = 3, label = 'Parent Sample')#, normed = True)
 ax2.hist(res.logmh, bins = bins, histtype = 'step', hatch = 'x',
-         edgecolor = 'orange', lw = 2, label = 'RESOLVE SELs')#, normed = True)
-ax2.legend()
-ax2.set_xlabel('log(M$_{halo}$/M$_{\odot}$)', fontsize = 15)
-ax2.set_ylabel('Number of galaxies', fontsize = 15)
+         edgecolor = 'orange', lw = 2, label = 'SELs')#, normed = True)
+ax2.legend(title = 'RESOLVE ')
+ax2.set_xlabel('log(M$_{halo}$/M$_{\odot}$)')#, fontsize = 15)
+ax2.set_ylabel('Number of galaxies')#, fontsize = 15)
 
 
 ecodwarf = eco[eco.logmstar < 9.5]
@@ -491,11 +499,13 @@ ecopc_up = [ecodwarfagnpc_up, ecoisodwarfagnpc_up, econonisodwarfagnpc_up, ecoce
                                                                     
 plt.figure()
 #plt.suptitle('Mass limited sample; AGN w/ conf = 2')
-plt.errorbar(xaxis, respc, fmt= 'bs', yerr = [-1.0*np.array(respc_low), respc_up], label = 'RESOLVE')
+plt.errorbar(xaxis, respc, fmt= 'bs', ms = 20, yerr = [-1.0*np.array(respc_low), respc_up], label = 'RESOLVE')
 plt.xticks(xaxis, ['Overall', 'Iso. Dwarf', 'Non-iso. Dwarf', 'Cen. Dwarf', 'Sat. Dwarf'])
-plt.errorbar(xaxis+0.2, ecopc, fmt= 'rs', yerr = [-1.0*np.array(ecopc_low), ecopc_up], label = 'ECO (excluding RESOLVE-A)')
-plt.ylabel('AGN % in Dwarf SELs')
-plt.legend()
+plt.errorbar(xaxis+0.2, ecopc, fmt= 'rs', ms = 20, yerr = [-1.0*np.array(ecopc_low), ecopc_up], label = 'ECO (excluding RESOLVE-A)')
+plt.axvspan(2, 4, alpha=0.5, color='gray')
+plt.axvspan(6, 8, alpha=0.5, color='gray')
+plt.ylabel('Percentage of AGN in Dwarf SELs')
+plt.legend(loc = 'lower left')
                                                                     
 plt.figure()
 plt.hist(econonisodwarf.logmh, bins = bins, label = 'ECO non-iso dwarf SELs',
@@ -545,31 +555,34 @@ plt.bar(bins[:9]+0.25,res_sub_agnfrac,yerr = [reslow,resup],color = 'none',
 
 plt.legend(loc = 'upper left')
 plt.xlabel('Log(M$_{halo}$/M$_\odot$)', fontsize = 15)
-plt.ylabel('Dwarf AGN Frequency', fontsize = 15)
+plt.ylabel('Percentage of Dwarf SEL AGN', fontsize = 15)
 #plt.ylim(0.,60)
 plt.xlim(10.25,15.25)
 
+bins = np.arange(10.5,15.5,0.5)
 plt.figure()
 res_sub_agnfrac, reslow, resup, \
-        eco_sub_agnfrac, ecolow, ecoup,mhbins = \
-        agnfrac_env('dwarf')
+        eco_sub_agnfrac, ecolow, ecoup,mhbins = agnfrac_env('dwarf')
 reslow[reslow<0.1] = 0
 ecolow[ecolow<0.1] = 0
 
-plt.errorbar(bins[:9]+0.25,eco_sub_agnfrac,fmt = '.-',yerr = [ecolow,ecoup],\
-             label = 'ECO SEL Dwarfs (excluding RESOLVE-A)', capsize = 5)
-plt.errorbar(bins[:9]+0.25,res_sub_agnfrac,fmt = '.-',yerr = [reslow,resup],\
-             label = 'RESOLVE SEL Dwarfs', capsize = 5)
-
-#plt.errorbar(bins[:9]+0.25,eco_sub_agnfrac,marker = '.', drawstyle = 'steps-mid', 
-#             yerr = [ecolow,ecoup],label = 'ECO SEL Dwarfs')
-#plt.errorbar(bins[:9]+0.25,res_sub_agnfrac,marker = '.', drawstyle = 'steps-mid', 
-#             yerr = [reslow,resup],label = 'RESOLVE SEL Dwarfs')
-
+plt.errorbar(bins[:9]+0.25,eco_sub_agnfrac,fmt = '.-',
+             yerr = [ecolow,ecoup], color = 'limegreen',\
+             label = 'ECO Dwarf SELs (excluding RESOLVE-A)', capsize = 10)
+plt.plot(bins[:9]+0.25,eco_sub_agnfrac,'s',
+             color = 'limegreen', ms = 10)
+plt.errorbar(bins[:9]+0.25,res_sub_agnfrac,fmt = '.-',
+             yerr = [reslow,resup], color = 'mediumvioletred',\
+             label = 'RESOLVE-A Dwarf SELs', capsize = 10)
+plt.plot(bins[:9]+0.25,res_sub_agnfrac,'s',
+             color = 'mediumvioletred', ms = 10)
+yaxis = np.arange(-5,105,0.1)
+plt.plot(11.5*np.ones(len(yaxis)),yaxis,'k--')
+plt.plot(12.0*np.ones(len(yaxis)),yaxis,'k-.')
 plt.legend(loc = 'upper left')
-plt.xlabel('Log(M$_{halo}$/M$_\odot$)', fontsize = 15)
-plt.ylabel('Dwarf AGN Frequency', fontsize = 15)
-#plt.ylim(0.,60)
+plt.xlabel('Log(M$_{halo}$/M$_\odot$)')
+plt.ylabel('Percentage of Dwarf SEL AGN')
+plt.ylim(-5.,105)
 plt.xlim(10.5,15.0)
 plt.xticks(np.arange(10.5,15.5,0.5))
 
@@ -595,7 +608,7 @@ plt.figure()
 #c = ['g','b',r','m','k']
 res_sub_agnfrac, reslow, resup, \
         eco_sub_agnfrac, ecolow, ecoup,mhbins = \
-        agnfrac_dens('dwarf', 'logmbary')
+        agnfrac_dens('all','logmbary')
 reslow[reslow<0.1] = 0
 ecolow[ecolow<0.1] = 0
 
@@ -610,16 +623,24 @@ ecolow[ecolow<0.1] = 0
 reslow[reslow<0.1] = 0
 ecolow[ecolow<0.1] = 0
 
-plt.errorbar(mhbins+(np.diff(mhbins)[0]/2),eco_sub_agnfrac,fmt = '.-',yerr = [ecolow,ecoup],\
-             label = 'ECO SEL Dwarfs (excluding RESOLVE-A)', capsize = 5)
-plt.errorbar(mhbins+(np.diff(mhbins)[0]/2),res_sub_agnfrac,fmt = '.-',yerr = [reslow,resup],\
-             label = 'RESOLVE-A SEL Dwarfs', capsize = 5)
-
+plt.errorbar(mhbins+(np.diff(mhbins)[0]/2),eco_sub_agnfrac,fmt = '.-',
+             yerr = [ecolow,ecoup], color = 'limegreen',\
+             label = 'ECO SELs (excluding RESOLVE-A)', capsize = 10)
+plt.plot(mhbins+(np.diff(mhbins)[0]/2),eco_sub_agnfrac,'s',
+             color = 'limegreen', ms = 10)
+plt.errorbar(mhbins+(np.diff(mhbins)[0]/2),res_sub_agnfrac,fmt = '.-',
+             yerr = [reslow,resup], color = 'mediumvioletred',\
+             label = 'RESOLVE-A SELs', capsize = 10)
+plt.plot(mhbins+(np.diff(mhbins)[0]/2),res_sub_agnfrac,'s',
+             color = 'mediumvioletred', ms = 10)
+yaxis = np.arange(-5,105,0.1)
+plt.plot(9.9*np.ones(len(yaxis)),yaxis,'k--')
 plt.legend(loc = 'upper left')
 #plt.xlabel('Normalized environmental density smoothed at 1Mpc scale', fontsize = 15)
-plt.xlabel('log(M_bary)', fontsize = 15)
-plt.ylabel('Percentage of Dwarf SEL AGN', fontsize = 15)
+plt.xlabel('log(M$_{bary}$/M$_\odot$)')
+plt.ylabel('Percentage of AGN in SELs')
 plt.xticks(mhbins)
+plt.ylim(-5,105)
 #plt.ylim(0.,60)
 #plt.xlim(-1, 5)
 #
